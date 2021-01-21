@@ -100,7 +100,12 @@ export default {
           // this.axios.post('/login',this.loginInfo)
           .then(function (resp) {
             console.log(resp)
-            _this.$router.push('/index')
+            if(resp.data!=='ok'){
+              _this.errorMessage=resp.data
+            }else{
+              _this.$router.push('/index')
+            }
+
             // if (resp.data.authority === 'student') {
             //   sessionStorage.setItem('authority', 'student')
             //   sessionStorage.setItem('currentUser', resp.data.swno)
