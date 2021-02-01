@@ -100,9 +100,12 @@ export default {
           // this.axios.post('/login',this.loginInfo)
           .then(function (resp) {
             console.log(resp)
-            if(resp.data!=='ok'){
-              _this.errorMessage=resp.data
-            }else{
+            if(resp.data.msg!=='ok'){
+              _this.errorMessage=resp.data.msg
+            } else{
+              sessionStorage.setItem('token',resp.data.token)
+              sessionStorage.setItem('userName',resp.data.userName)
+              sessionStorage.setItem('userAccount',resp.data.userAccount)
               _this.$router.push('/index')
             }
 

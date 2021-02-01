@@ -17,11 +17,42 @@
     import message from '../../components/chat/message.vue'
     import usertext from '../../components/chat/usertext.vue'
 
+    // const ws = new WebSocket('ws://localhost:8100')
     export default {
         name: 'FriendChat',
+      methods:{
+      //   handleSendBtnClick(e){
+      //     const msg = this.msg;
+      //     if (!msg.trim().length){}
+      //     return ;
+      //   },
+      //   handleWsOpen(e){
+      //       const msg = this.msg;
+      //       if (!msg.trim().length){}
+      //       return ;
+      //   },
+      //   handleWsClose(e){
+      //
+      //   },
+      //   handleWsError(e){
+      //
+      //   },
+      //   handleWsMessage(e){
+      //
+      //   },
+      //
+      // },
+      //   mount(){
+      //       ws.addEventListener('open',this.handleWsOpen.bind(this),false)
+      //       ws.addEventListener('close',this.handleWsClose.bind(this),false)
+      //       ws.addEventListener('error',this.handleWsError.bind(this),false)
+      //       ws.addEventListener('message',this.handleWsMessage.bind(this),false )
+          },
         data () {
             return {
-
+              msg:'',
+              username:'',
+              msgList:[]
             }
         },
         mounted:function() {
