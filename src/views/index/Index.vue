@@ -7,7 +7,8 @@
           <el-menu-item index="/addFriend">添加好友</el-menu-item>
           <el-submenu index="2">
             <template slot="title">好友列表</template>
-            <el-menu-item index="/chat" v-for="(item) in friendsList"  :key="item.userName">
+<!--            <el-menu-item index="/friendChat" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">-->
+            <el-menu-item index="/chat" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">
               {{item.userName}}
             </el-menu-item>
           </el-submenu>
@@ -17,7 +18,9 @@
           <el-menu-item index="/addGroup">新建群聊</el-menu-item>
           <el-submenu index="4">
             <template slot="title">群聊列表</template>
-            <el-menu-item index="/selectAllTeacher">群聊列表</el-menu-item>
+            <el-menu-item index="/groupChat" v-for="(item) in groupList"  :key="item.groupName" @click="pushGroupInfo(item.groupId,item.groupName)">
+              {{item.groupName}}
+            </el-menu-item>
           </el-submenu>
         </el-submenu>
 <!--        <el-submenu index="3">-->
@@ -55,6 +58,7 @@ export default {
   data() {
     return {
       friendsList:[],
+      groupList:[]
   };
 },
   methods:{
@@ -75,6 +79,28 @@ export default {
         // sessionStorage.setItem("currentUser","")
         _this.$router.push('/login')
       })
+    },
+    pushGroupInfo(groupId,groupName){
+      this.$router.push(
+          {path:'/groupChat',
+            query:{
+              currentGroupName:groupName,
+              currentGroupId:groupId
+          }
+          }
+          )
+    },
+    pushFriendInfo(fUserAccount,fUserName){
+      this.$router.push(
+          {
+            path:'/chat',
+            // path:'/friendChat',
+            query:{
+              currentFUserName:fUserName,
+              currentFUserAccount:fUserAccount
+            }
+          }
+      )
     }
   },
   beforeCreate() {
@@ -91,10 +117,17 @@ export default {
         Authorization: sessionStorage.token
       }
     }).then(function (resp){
-      console.log(resp)
-      // this.friendsList=resp.data
       _this.friendsList = resp.data
-      console.log(_this.friendsList[0].userName)
+    })
+    this.axios({
+      url:'/group/getUserGroup',
+      method: 'get',
+      headers: {
+        Authorization: sessionStorage.token
+      }
+    }).then(function (resp){
+      _this.groupList = resp.data.allGroup
+      console.log(_this.groupList)
     })
   }
 }

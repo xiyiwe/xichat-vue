@@ -44,7 +44,7 @@ export default {
         }
       }).then(function (resp) {
         if (resp.data.msg === 'ok') {
-          _this.$alert(_this.ruleForm.userAccount + ' 新建成功！', '消息', {
+          _this.$alert(_this.ruleForm.groupName + ' 新建成功！', '消息', {
             confirmButtonText: '确定',
             // eslint-disable-next-line no-unused-vars
             callback: action => {
