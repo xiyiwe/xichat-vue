@@ -8,7 +8,7 @@
           <el-submenu index="2">
             <template slot="title">好友列表</template>
 <!--            <el-menu-item index="/friendChat" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">-->
-            <el-menu-item index="/chat" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">
+            <el-menu-item index="/friendChat" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">
               {{item.userName}}
             </el-menu-item>
           </el-submenu>
@@ -23,11 +23,6 @@
             </el-menu-item>
           </el-submenu>
         </el-submenu>
-<!--        <el-submenu index="3">-->
-<!--          <template slot="title">课程管理</template>-->
-<!--          <el-menu-item index="/selectAllCourse">课程管理</el-menu-item>-->
-<!--          <el-menu-item index="/editCurrentTerm">修改当前学期</el-menu-item>-->
-<!--        </el-submenu>-->
       </el-menu>
     </el-aside>
 
@@ -93,8 +88,8 @@ export default {
     pushFriendInfo(fUserAccount,fUserName){
       this.$router.push(
           {
-            path:'/chat',
-            // path:'/friendChat',
+            // path:'/chat',
+            path:'/friendChat',
             query:{
               currentFUserName:fUserName,
               currentFUserAccount:fUserAccount

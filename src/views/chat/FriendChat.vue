@@ -10,22 +10,22 @@
           <el-main>
             <div class="chat-content">
               <!-- recordContent 聊天记录数组-->
-              <div v-for="(itemc,indexc) in recordContent" :key="indexc">
+              <div v-for="(messages,indexc) in messageList" :key="indexc">
                 <!-- 对方 -->
-                <div class="word" v-if="!itemc.mineMsg">
-                  <img :src="itemc.headUrl">
+                <div class="word" v-if="userAccount!==messages.senderAccount">
+                  <img :src="messages.imgUrl">
                   <div class="info">
-                    <p class="time">{{itemc.nickName}}  {{chatTime(itemc.timestamp)}}</p>
-                    <div class="info-content">{{itemc.contactText}}</div>
+                    <p class="time">{{messages.senderName}}  {{messages.createTime}}</p>
+                    <div class="info-content">{{messages.sendMessage}}</div>
                   </div>
                 </div>
                 <!-- 我的 -->
                 <div class="word-my" v-else>
                   <div class="info">
-                    <p class="time">{{itemc.nickName}}  {{chatTime(itemc.timestamp)}}</p>
-                    <div class="info-content">{{itemc.contactText}}</div>
+                    <p class="time">{{messages.senderName}}  {{messages.createTime}}</p>
+                    <div class="info-content">{{messages.sendMessage}}</div>
                   </div>
-                  <img :src="itemc.headUrl">
+                  <img :src="messages.imgUrl">
                 </div>
               </div>
             </div>
@@ -33,11 +33,9 @@
           <el-footer>
             <div>
               消息：<input type="text" v-model="sendMessage"/>
-            </div>
-            <div>
               <input type="button" value="发送消息" @click="sendMessageBySocket()"/>
-              Footer
             </div>
+
 
           </el-footer>
         </el-container>
@@ -62,26 +60,35 @@ export default {
           senderName:'',
           receiverAccount:'',
           receiverName:'',
-          imgUrl:''
+          imgUrl:'',
+          createTime:''
         }
       ],
       fUserAccount:'',
       fUserName:'',
       sendMessage:'',
-      sendMessageInfo:[{
+      sendMessageInfo:{
         sendMessage:'',
         senderAccount:'',
         senderName:'',
         receiverAccount:'',
         receiverName:'',
         imgUrl:''
-      }
-      ],
+      },
+      receiveMessageInfo:{
+        sendMessage:'',
+        senderAccount:'',
+        senderName:'',
+        receiverAccount:'',
+        receiverName:'',
+        imgUrl:'',
+        createTime:''
+      },
       sendMessageInfoString:'',
       openMessage:'',
       closeMessage:'',
       errorMessage:'',
-      message:'',
+
       userAccount: '',
       userName:'',
       wsUri :'' ,
@@ -90,9 +97,7 @@ export default {
   },
   methods:{
     createWebSocket(){
-
         this.initWsEventHandle();
-
     },
     initWsEventHandle(){
       // eslint-disable-next-line no-unused-vars
@@ -101,10 +106,9 @@ export default {
       }
       // eslint-disable-next-line no-unused-vars
       this.wsObj.onmessage = function (evt){
-        console.log("执行信息")
-        console.log(evt)
-        this.message = evt.data
-        console.log(this.message)
+        console.log("接收消息")
+        console.log(JSON.parse(evt.data))
+        this.receiveMessageInfo = JSON.parse(evt.data)
       }
       console.log("执行错误")
       this.wsObj.onerror =function (evt){this.onWsError(evt)}
@@ -141,7 +145,7 @@ export default {
           this.sendMessageInfo.receiverAccount+
           "\",\"receiverName\":\""+
           this.sendMessageInfo.receiverName+
-          "\",\"receiverAccount\":\""+
+          "\",\"imgUrl\":\""+
           this.sendMessageInfo.imgUrl+
           "\"}"
       // this.sendMessageInfoString = JSON.stringify(this.sendMessageInfo)
@@ -150,17 +154,12 @@ export default {
       this.wsObj.send(this.sendMessageInfoString)
     }
   },
-  // message:'',
-  // senderAccount:'',
-  // senderName:'',
-  // receiverAccount:'',
-  // receiverName:''
+
   mounted() {
     this.userAccount = sessionStorage.getItem("userAccount")
-    console.log(this.userAccount+"1")
     this.userName = sessionStorage.getItem("userName")
-    this.fUserAccount = this.$route.query.currentFUserName
-    this.fUserName = this.$route.query.currentFUserAccount
+    this.fUserAccount = this.$route.query.currentFUserAccount
+    this.fUserName = this.$route.query.currentFUserName
     this.wsUri = 'ws://localhost:8100/friendsChat/'+this.userAccount
     this.wsObj = new WebSocket(this.wsUri)
     this.createWebSocket()
@@ -189,14 +188,14 @@ export default {
   background-color: #D3DCE6;
   color: #333;
   text-align: center;
-  line-height: 200px;
+  line-height: 500px;
 }
 
 .el-main {
   background-color: #E9EEF3;
   color: #333;
   text-align: center;
-  line-height: 160px;
+  line-height: 360px;
 }
 
 body > .el-container {
