@@ -2,40 +2,43 @@
   <div>
     <el-container>
       <el-header>
-        head
+        <p >
+          当前聊天用户:{{this.$route.query.currentFUserName}}
+        </p>
       </el-header>
       <el-container>
         <el-aside width="200px">Aside</el-aside>
         <el-container>
           <el-main>
-            <div class="chat-content">
+            <el-scrollbar style="height:99%">
+            <div class="chat-content" >
               <!-- recordContent 聊天记录数组-->
-              <div v-for="(messages,indexc) in messageList" :key="indexc">
+              <div v-for="(messages,index) in messageList" :key="index" >
                 <!-- 对方 -->
                 <div class="word" v-if="userAccount!==messages.senderAccount">
-                  <img :src="messages.imgUrl">
+<!--                  <img :src="messages.imgUrl">-->
                   <div class="info">
-                    <p class="time">{{messages.senderName}}  {{messages.createTime}}</p>
-                    <div class="info-content">{{messages.sendMessage}}</div>
+                    <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
+                    <p class="info-content">{{messages.messageContent}}</p>
                   </div>
                 </div>
                 <!-- 我的 -->
                 <div class="word-my" v-else>
-                  <div class="info">
-                    <p class="time">{{messages.senderName}}  {{messages.createTime}}</p>
-                    <div class="info-content">{{messages.sendMessage}}</div>
+                  <div class="info-my">
+                    <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
+                    <div class="info-content-my">{{messages.messageContent}}</div>
+<!--                  <img :src="messages.imgUrl">-->
                   </div>
-                  <img :src="messages.imgUrl">
                 </div>
               </div>
             </div>
+            </el-scrollbar>
           </el-main>
           <el-footer>
             <div>
               消息：<input type="text" v-model="sendMessage"/>
               <input type="button" value="发送消息" @click="sendMessageBySocket()"/>
             </div>
-
 
           </el-footer>
         </el-container>
@@ -49,21 +52,15 @@
 </template>
 
 <script>
+import {formatDate} from "@/utils/formatDate";
+
 export default {
   name: "FriendChat",
   data() {
+    // let  messageList =[] ;
     return {
-      messageList:[
-        {
-          sendMessage:'',
-          senderAccount:'',
-          senderName:'',
-          receiverAccount:'',
-          receiverName:'',
-          imgUrl:'',
-          createTime:''
-        }
-      ],
+      messageList:[],
+      // messageList,
       fUserAccount:'',
       fUserName:'',
       sendMessage:'',
@@ -75,8 +72,11 @@ export default {
         receiverName:'',
         imgUrl:''
       },
-      receiveMessageInfo:{
-        sendMessage:'',
+      receiveMessageInfo: {
+        messageId: {
+        account: '',
+      },
+        messageContent:'',
         senderAccount:'',
         senderName:'',
         receiverAccount:'',
@@ -88,11 +88,16 @@ export default {
       openMessage:'',
       closeMessage:'',
       errorMessage:'',
-
       userAccount: '',
       userName:'',
       wsUri :'' ,
       wsObj: ''
+    }
+  },
+  filters:{
+    formatDate(time) {
+      let date = new Date(time);
+      return formatDate(date, 'yyyy年MM月dd日 hh:mm:ss');
     }
   },
   methods:{
@@ -100,32 +105,27 @@ export default {
         this.initWsEventHandle();
     },
     initWsEventHandle(){
+      const _this = this
       // eslint-disable-next-line no-unused-vars
       this.wsObj.onopen=function (event) {
         console.log("WebSocket is open now.");
       }
-      // eslint-disable-next-line no-unused-vars
       this.wsObj.onmessage = function (evt){
-        console.log("接收消息")
-        console.log(JSON.parse(evt.data))
-        this.receiveMessageInfo = JSON.parse(evt.data)
+        console.log(JSON.parse(evt.data).receiverName)
+        if (JSON.parse(evt.data).senderAccount!==_this.fUserAccount&&JSON.parse(evt.data).senderAccount !== _this.userAccount ){
+          console.log("当前不是这个好友")
+          _this.messageRemind();
+        }else{
+          _this.messageList.push(JSON.parse(evt.data))
+          this.$emit("updateNotReadMessage",JSON.parse(evt.data).senderAccount)
+        }
+
+
       }
-      console.log("执行错误")
-      this.wsObj.onerror =function (evt){this.onWsError(evt)}
-      console.log("执行关闭")
+      // console.log("执行错误")
+      // this.wsObj.onerror =function (evt){this.onWsError(evt)}
+      // console.log("执行关闭")
       this.wsObj.onclose = function (evt){this.onWsClose(evt)}
-    },
-    onWsOpen(evt){
-      this.openMessage = evt.data
-    },
-    onWsMessage(evt){
-      this.message = evt.data
-    },
-    onWsError(evt){
-      this.errorMessage = evt.data
-    },
-    onWsClose(evt){
-      this.closeMessage = evt.data
     },
     sendMessageBySocket: function () {
       console.log("send message")
@@ -150,9 +150,26 @@ export default {
           "\"}"
       // this.sendMessageInfoString = JSON.stringify(this.sendMessageInfo)
 
-      console.log(this.sendMessageInfoString)
+      // console.log(this.sendMessageInfoString)
       this.wsObj.send(this.sendMessageInfoString)
-    }
+    },
+    messageRemind(){
+      // eslint-disable-next-line no-undef
+      this.$emit("updateFriendListAndNotReadMessage")
+    },
+    getNotReadMessage(fUserAccount) {
+      const _this = this
+      _this.axios({
+        url: '/friend/getFriendNotReadMessage/'+fUserAccount,
+        method: 'get',
+        headers: {
+          Authorization: sessionStorage.token
+        }
+      }).then(function (rsp) {
+          _this.messageList = rsp.data
+        console.log( _this.messageList)
+        })
+      }
   },
 
   mounted() {
@@ -163,7 +180,29 @@ export default {
     this.wsUri = 'ws://localhost:8100/friendsChat/'+this.userAccount
     this.wsObj = new WebSocket(this.wsUri)
     this.createWebSocket()
+    this.getNotReadMessage(this.fUserAccount)
   },
+  beforeRouteEnter  (to, from, next) {
+    this.messageList = []
+    // this.getNotReadMessage(this.$route.query.currentFUserAccount)
+    next(vm=>{
+    //   const _this = vm
+    //   _this.axios({
+    //     url: '/friend/getFriendNotReadMessage/'+_this.$route.query.currentFUserAccount,
+    //     method: 'get',
+    //     headers: {
+    //       Authorization: sessionStorage.token
+    //     }
+    //   }).then(function (rsp) {
+    //     vm.messageList = rsp.data
+    //     console.log( vm.messageList)
+    //   })
+    // })
+    },
+    // 在当前路由改变，但是该组件被复用时调用
+    // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
+    // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+    // 可以访问组件实例 `this`
   directives: {/*这个是vue的自定义指令,官方文档有详细说明*/
     // 发送消息后滚动到底部,这里无法使用原作者的方法，也未找到合理的方法解决，暂用setTimeout的方法模拟
     'scroll-bottom'(el) {
@@ -195,7 +234,9 @@ export default {
   background-color: #E9EEF3;
   color: #333;
   text-align: center;
-  line-height: 360px;
+  line-height: 20px;
+  width: 100%;
+  height: 100%;
 }
 
 body > .el-container {
@@ -208,7 +249,9 @@ body > .el-container {
   padding: 20px;}
 .word{
   display: flex;
-  margin-bottom: 20px;}
+  justify-content:flex-end;
+  margin-bottom: 20px;
+}
 img{
   width: 40px;
   height: 40px;
@@ -224,29 +267,13 @@ img{
   line-height: 20px;
   margin-top: -5px;
 }
-.info-content{
-  padding: 10px;
-  font-size: 14px;
-  background: #fff;
-  position: relative;
-  margin-top: 8px;
-}
-/*小三角形*/
-  .info-content::before{
-    position: absolute;
-    left: -8px;
-    top: 8px;
-    content: '';
-    border-right: 10px solid #FFF;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-  }
-
 
 .word-my{
   display: flex;
   justify-content:flex-end;
-  margin-bottom: 20px;}
+  margin-bottom: 20px;
+  text-align: right;
+}
 img{
   width: 40px;
   height: 40px;
@@ -254,7 +281,11 @@ img{
 }
 .info{
   width: 90%;
-  margin-left: 10px;
+  margin-right: 10px;
+  text-align: left;}
+.info-my{
+  width: 90%;
+  margin-right: 10px;
   text-align: right;}
 .time{
   font-size: 12px;
@@ -265,7 +296,7 @@ img{
   margin-top: -5px;
   margin-right: 10px;
 }
-.info-content{
+.info-content-my{
   max-width: 70%;
   padding: 10px;
   font-size: 14px;
@@ -276,15 +307,19 @@ img{
   background: #A3C3F6;
   text-align: left;
 }
+.info-content{
+  background: #FFFFFF;
+  float: left;
+}
 /*//小三角形!**!*/
-  .info-content::after{
-    position: absolute;
-    right: -8px;
-    top: 8px;
-    content: '';
-    border-left: 10px solid #A3C3F6;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-  }
+/*  .info-content::after{*/
+/*    position: absolute;*/
+/*    right: -8px;*/
+/*    top: 8px;*/
+/*    content: '';*/
+/*    border-left: 10px solid #A3C3F6;*/
+/*    border-top: 8px solid transparent;*/
+/*    border-bottom: 8px solid transparent;*/
+/*  }*/
 
 </style>

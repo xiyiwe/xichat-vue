@@ -32,7 +32,7 @@ export default new Router({
       component: Index,
       children: [
         {
-          path: '/friendChat',
+          path: '/friendChat/:fUserAccount',
           name: 'FriendChat',
           component: FriendChat
         },

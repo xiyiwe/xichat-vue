@@ -48,7 +48,7 @@
                       confirmButtonText: '确定',
                       // eslint-disable-next-line no-unused-vars
                       callback: action => {
-                        _this.$router.push('/addfriend')
+                        _this.$router.push('/addFriend')
                         window.location.reload()
                       }
                     })

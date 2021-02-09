@@ -8,8 +8,9 @@
           <el-submenu index="2">
             <template slot="title">好友列表</template>
 <!--            <el-menu-item index="/friendChat" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">-->
-            <el-menu-item index="/friendChat" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">
+            <el-menu-item index="/friendChat/" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">
               {{item.userName}}
+              <span style="color: red" v-if="item.notReadMessageCount!=='0'">{{ item.notReadMessageCount }}</span>
             </el-menu-item>
           </el-submenu>
         </el-submenu>
@@ -49,14 +50,29 @@
 <script>
 export default {
   name: "Index",
-  user: '',
+  // groupList:[],
   data() {
     return {
+      user:'',
+      groupList:[],
       friendsList:[],
-      groupList:[]
+      notReadMessageCount:0,
+      notReadPersonList:[]
   };
 },
   methods:{
+    // updateNotReadMessage(){
+    //   const _this = this
+    //   this.axios({
+    //     url:'/friend/getNotReadMessageCountFromFriend'+,
+    //     method: 'get',
+    //     headers: {
+    //       Authorization: sessionStorage.token
+    //     }
+    //   }).then(function (resp){
+    //     _this.friendsList = resp.data
+    //   })
+    // },
     logout(){
       const _this = this
       this.axios({
@@ -82,38 +98,62 @@ export default {
               currentGroupName:groupName,
               currentGroupId:groupId
           }
-          }
-          )
+          })
     },
     pushFriendInfo(fUserAccount,fUserName){
+      this.updateNotReadMessage(fUserAccount)
+      this.updateFriendListAndNotReadMessage()
       this.$router.push(
           {
-            // path:'/chat',
-            path:'/friendChat',
+            path:'/friendChat/'+fUserAccount,
             query:{
               currentFUserName:fUserName,
               currentFUserAccount:fUserAccount
             }
           }
       )
+    },
+    pushUpdateMethod(fUserAccount){
+      this.updateNotReadMessage(fUserAccount)
+      this.updateFriendListAndNotReadMessage()
+    },
+    updateNotReadMessage(fUserAccount){
+      const _this = this
+      _this.axios({
+        url:'/friend/updateFriendNotReadMessage/'+fUserAccount,
+        method: 'get',
+        headers: {
+          Authorization: sessionStorage.token
+        }
+      })
+    },
+    updateFriendListAndNotReadMessage(){
+      const _this = this
+      _this.axios({
+        url:'/friend/getUserFriendsAndNotReadMessage',
+        method: 'get',
+        headers: {
+          Authorization: sessionStorage.token
+        }
+      }).then(function (resp){
+        _this.friendsList = resp.data
+      })
     }
   },
-  beforeCreate() {
+  mounted() {
     const _this = this
-    this.user = sessionStorage.getItem("userName")
-    // if(sessionStorage.getItem("token")===null)
-    // {
-    //   this.$router.push('/login')
-    // }
-    this.axios({
-      url:'/friend/getUserFriends',
-      method: 'get',
-      headers: {
-        Authorization: sessionStorage.token
-      }
-    }).then(function (resp){
-      _this.friendsList = resp.data
-    })
+    _this.user = sessionStorage.getItem("userName")
+    // _this.updateFriendListAndNotReadMessage()
+    _this.updateFriendListAndNotReadMessage()
+    // this.axios({
+    //   url:'/friend/getUserFriends',
+    //   method: 'get',
+    //   headers: {
+    //     Authorization: sessionStorage.token
+    //   }
+    // }).then(function (resp){
+    //   _this.friendsList = resp.data
+    // })
     this.axios({
       url:'/group/getUserGroup',
       method: 'get',
@@ -122,7 +162,6 @@ export default {
       }
     }).then(function (resp){
       _this.groupList = resp.data.allGroup
-      console.log(_this.groupList)
     })
   }
 }
