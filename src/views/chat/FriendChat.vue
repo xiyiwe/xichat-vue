@@ -117,7 +117,7 @@ export default {
           _this.messageRemind();
         }else{
           _this.messageList.push(JSON.parse(evt.data))
-          this.$emit("updateNotReadMessage",JSON.parse(evt.data).senderAccount)
+          _this.$emit("updateNotReadMessage",JSON.parse(evt.data).senderAccount)
         }
 
 
@@ -155,6 +155,7 @@ export default {
     },
     messageRemind(){
       // eslint-disable-next-line no-undef
+      console.log("调用了messageRemind")
       this.$emit("updateFriendListAndNotReadMessage")
     },
     getNotReadMessage(fUserAccount) {
@@ -183,21 +184,24 @@ export default {
     this.getNotReadMessage(this.fUserAccount)
   },
   beforeRouteEnter  (to, from, next) {
-    this.messageList = []
+    // this.messageList = []
     // this.getNotReadMessage(this.$route.query.currentFUserAccount)
-    next(vm=>{
-    //   const _this = vm
-    //   _this.axios({
-    //     url: '/friend/getFriendNotReadMessage/'+_this.$route.query.currentFUserAccount,
-    //     method: 'get',
-    //     headers: {
-    //       Authorization: sessionStorage.token
-    //     }
-    //   }).then(function (rsp) {
-    //     vm.messageList = rsp.data
-    //     console.log( vm.messageList)
-    //   })
-    // })
+    next(
+        vm=> {
+          vm.messageList = []
+          const _vm = vm
+        _vm.axios({
+          url: '/friend/getFriendNotReadMessage/'+_vm.$route.query.currentFUserAccount,
+          method: 'get',
+          headers: {
+            Authorization: sessionStorage.token
+          }
+        }).then(function (rsp) {
+          _vm.messageList = rsp.data
+            console.log( _vm.messageList)
+        })
+    }
+    )
     },
     // 在当前路由改变，但是该组件被复用时调用
     // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，

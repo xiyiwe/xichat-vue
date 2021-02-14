@@ -1,7 +1,7 @@
 <template>
   <el-container style="height: 1000px; border: 1px solid #eee">
     <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-      <el-menu router :default-openeds="['1', '4']">
+      <el-menu router :default-openeds="['1', '2','3','4']">
         <el-submenu index="1">
           <template slot="title">好友菜单</template>
           <el-menu-item index="/addFriend">添加好友</el-menu-item>
@@ -41,7 +41,7 @@
       </el-header>
 
       <el-main>
-        <router-view></router-view>
+        <router-view @updateFriendListAndNotReadMessage="updateFriendListAndNotReadMessage"></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -103,6 +103,7 @@ export default {
     pushFriendInfo(fUserAccount,fUserName){
       this.updateNotReadMessage(fUserAccount)
       this.updateFriendListAndNotReadMessage()
+      // this.$forceUpdate()
       this.$router.push(
           {
             path:'/friendChat/'+fUserAccount,
@@ -129,14 +130,18 @@ export default {
     },
     updateFriendListAndNotReadMessage(){
       const _this = this
+      console.log("调用了updateFriendListAndNotReadMessage")
       _this.axios({
         url:'/friend/getUserFriendsAndNotReadMessage',
         method: 'get',
         headers: {
           Authorization: sessionStorage.token
         }
-      }).then(function (resp){
-        _this.friendsList = resp.data
+      }).then(resp=> {
+        this.friendsList = resp.data
+        this.friendsList.forEach(item=>console.log(item.userAccount+"未读信息:"+item.notReadMessageCount))
+        // console.log("接收后的朋友列表"+resp)
+        // this.$forceUpdate()
       })
     }
   },
