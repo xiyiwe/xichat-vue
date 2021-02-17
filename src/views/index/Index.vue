@@ -1,5 +1,5 @@
 <template>
-  <el-container style="height: 1000px; border: 1px solid #eee">
+  <el-container style="height: 700px; border: 1px solid #eee;flex-grow:1" >
     <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
       <el-menu router :default-openeds="['1', '2','3','4']">
         <el-submenu index="1">
@@ -130,7 +130,7 @@ export default {
     },
     updateFriendListAndNotReadMessage(){
       const _this = this
-      console.log("调用了updateFriendListAndNotReadMessage")
+      // console.log("调用了updateFriendListAndNotReadMessage")
       _this.axios({
         url:'/friend/getUserFriendsAndNotReadMessage',
         method: 'get',
@@ -139,9 +139,6 @@ export default {
         }
       }).then(resp=> {
         this.friendsList = resp.data
-        this.friendsList.forEach(item=>console.log(item.userAccount+"未读信息:"+item.notReadMessageCount))
-        // console.log("接收后的朋友列表"+resp)
-        // this.$forceUpdate()
       })
     }
   },
