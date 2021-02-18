@@ -54,6 +54,7 @@ export default {
   data() {
     return {
       user:'',
+      currentFUserAccount:'',
       groupList:[],
       friendsList:[],
       notReadMessageCount:0,
@@ -100,25 +101,34 @@ export default {
           }
           })
     },
+    //点击左侧好友
     pushFriendInfo(fUserAccount,fUserName){
-      this.updateNotReadMessage(fUserAccount)
-      this.updateFriendListAndNotReadMessage()
-      // this.$forceUpdate()
-      this.$router.push(
-          {
-            path:'/friendChat/'+fUserAccount,
-            query:{
-              currentFUserName:fUserName,
-              currentFUserAccount:fUserAccount
+      // if(this.currentFUserAccount===''){
+      //   this.currentFUserAccount = fUserAccount
+      // }
+      // console.log(fUserAccount)
+      // console.log(this.currentFUserAccount)
+      // if(fUserAccount!==this.currentFUserAccount)
+      // {
+        this.$router.push(
+            {
+              path:'/friendChat/'+fUserAccount,
+              query:{
+                currentFUserName:fUserName,
+                currentFUserAccount:fUserAccount
+              }
             }
-          }
-      )
+        )
+      // }
+      // this.$forceUpdate()
     },
     pushUpdateMethod(fUserAccount){
       this.updateNotReadMessage(fUserAccount)
       this.updateFriendListAndNotReadMessage()
     },
+    //更新单个好友左侧未读信息数量
     updateNotReadMessage(fUserAccount){
+      console.log("调用了updateNotReadMessage")
       const _this = this
       _this.axios({
         url:'/friend/updateFriendNotReadMessage/'+fUserAccount,
@@ -128,6 +138,7 @@ export default {
         }
       })
     },
+    //查询所有好友发来的未读消息数量和好友信息
     updateFriendListAndNotReadMessage(){
       const _this = this
       // console.log("调用了updateFriendListAndNotReadMessage")
