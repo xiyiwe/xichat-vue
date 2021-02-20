@@ -12,11 +12,17 @@
           <el-main style="height:500px;flex-grow:1;">
             <el-scrollbar >
             <div class="chat-content" >
+              <div>
+                <el-image
+                    style="width: 100px; height: 100px"
+                   :src="imgDemo"
+                ></el-image>
+              </div>
               <!-- recordContent 聊天记录数组-->
               <div v-for="(messages,index) in messageList" :key="index" >
                 <!-- 对方 -->
                 <div class="word" v-if="userAccount!==messages.senderAccount">
-<!--                  <img :src="messages.imgUrl">-->
+<!--                  <img :src="messages.fileUrl">-->
                   <div class="info">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                     <p class="info-content">{{messages.messageContent}}</p>
@@ -27,7 +33,8 @@
                   <div class="info-my">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                     <div class="info-content-my">{{messages.messageContent}}</div>
-<!--                  <img :src="messages.imgUrl">-->
+                    <a :href="messages.fileUrl">{{messages.fileUrl}}</a>
+<!--                    <img :src="messages.fileUrl">-->
                   </div>
                 </div>
               </div>
@@ -42,6 +49,7 @@
 
                   <el-scrollbar style="height:70%">
                     <div class="chat-content" >
+
                       <!-- recordContent 聊天记录数组-->
                       <div v-for="(messages,index) in historyMessageList" :key="index" >
                         <!-- 对方 -->
@@ -50,6 +58,7 @@
                           <div class="info">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                             <p class="info-content">{{messages.messageContent}}</p>
+<!--                            <img :src="messages.fileUrl">-->
                           </div>
                         </div>
                         <!-- 我的 -->
@@ -57,7 +66,6 @@
                           <div class="info-my">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                             <div class="info-content-my">{{messages.messageContent}}</div>
-                            <!--                  <img :src="messages.imgUrl">-->
                           </div>
                         </div>
                       </div>
@@ -82,21 +90,27 @@
               </el-button>
             </div>
             <div>
-              <el-upload
-                  class="upload-demo"
-                  ref="upload"
-                  action="/friend/upload"
-                  accept=".png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf"
-                  :limit="limitFile"
-                  :on-change="picFile"
-                  :auto-upload="false"
-                  :file-list="fileList">
-                <el-button  type="primary" style="margin-top: 10px;float: left" >
-                  点击上传
-                </el-button>
-<!--                <div slot="tip" class="el-upload__tip">支持文件格式有png,jpg,jpeg,doc,docx,xls,xlsx,ppt,pdf,文件大小不超过2M</div>-->
-              </el-upload>
-              <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+<!--              <el-upload-->
+<!--                  class="upload-demo"-->
+<!--                  ref="upload"-->
+<!--                  action="#"-->
+<!--                  :http-request="uploadMethod"-->
+<!--                  accept=".png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf"-->
+<!--                  :limit="limitFile"-->
+<!--                  :on-change="picFile"-->
+<!--                  :auto-upload="false"-->
+<!--                  :file-list="fileList">-->
+<!--                <el-button  type="primary" style="margin-top: 10px;float: left" >-->
+<!--                  点击上传-->
+<!--                </el-button>-->
+<!--&lt;!&ndash;                <div slot="tip" class="el-upload__tip">支持文件格式有png,jpg,jpeg,doc,docx,xls,xlsx,ppt,pdf,文件大小不超过2M</div>&ndash;&gt;-->
+<!--              </el-upload>-->
+<!--              <el-form @change="uploadMethod" id="domeform"  method="post" enctype="multipart/form-data">-->
+                <input type="file"  value="选择文件" @change="getFile($event)">
+<!--                <input type="submit" value="表单提交">-->
+                <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传</el-button>
+              <span>{{uploadReturnMessage}}</span>
+<!--              </el-form>-->
             </div>
           </el-footer>
         </el-container>
@@ -116,6 +130,7 @@ export default {
   name: "FriendChat",
   data() {
     return {
+      imgDemo:'C:\\zyz\\biyesheji\\xichat\\xichat-vue\\xichat-vue\\src\\static\\logo.png',
       // actionUrl:'D:\\itemRepository\\gitRepository\\xichat-vue\\src\\files\\',
       limitFile:1,
       fileList:[],
@@ -136,18 +151,9 @@ export default {
         receiverName:'',
         fileUrl:''
       },
-      // receiveMessageInfo: {
-      //   messageId: {
-      //   account: '',
-      // },
-      //   messageContent:'',
-      //   senderAccount:'',
-      //   senderName:'',
-      //   receiverAccount:'',
-      //   receiverName:'',
-      //   fileUrl:'',
-      //   createTime:''
-      // },
+
+      uploadReturnMessage:'',
+      uploadFile:'',
       sendMessageInfoString:'',
       openMessage:'',
       closeMessage:'',
@@ -166,62 +172,128 @@ export default {
   },
   methods:{
 
-    submitUpload(){
-      if(this.fileList.length===0){
-        console.log("请先选择文件")
-        return
-      }
-      this.$refs.upload.submit();
-    },
-    beforeUploadFile(file){
-      // console.log('before upload')
-      var testmsg = file.name.substring(file.name.lastIndexOf('.')+1)
-      var size = file.size / 1024 / 1024
-      // var type=".png.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf"
-      var extension  = testmsg === 'png'
-      var extension1 = testmsg === 'jpg'
-      var extension2 = testmsg === 'jpeg'
-      var extension3 = testmsg === 'doc'
-      var extension4 = testmsg === 'docx'
-      var extension5 = testmsg === 'xls'
-      var extension6 = testmsg === 'xlsx'
-      var extension7 = testmsg === 'ppt'
-      var extension8 = testmsg === 'pdf'
-
-      if(!extension && !extension1&& !extension2&& !extension3&& !extension4&& !extension5&& !extension6&& !extension7&& !extension8) {
-        this.$message.warning({
-          title: '警告',
-          message: "只能上传.png.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf的文件"
-        });
-        return false;
-      }else {
-        if(size > 2) {
-          this.$message.warning({
-            title: '警告',
-            message: "文件大小不得超过2M"
-          });
-          return false;
+    getFile(event){
+      var file = event.target.files;
+      // this.uploadFile=file[0]
+      for(var i = 0;i<file.length;i++){
+        //    上传类型判断
+        this.uploadFile=file[0]
+        var imgName = file[i].name;
+        var idx = imgName.lastIndexOf(".");
+        if (idx != -1){
+          var ext = imgName.substr(idx+1).toUpperCase();
+          ext = ext.toLowerCase( );
+          if (ext!='pdf' && ext!='doc' && ext!='docx' && ext!='png'){
+              return false
+          }else{
+            this.fileList.push(file[i]);
+          }
         }
       }
-
-      return (extension || extension1|| extension2|| extension3|| extension4|| extension5|| extension6|| extension7|| extension8) && size
     },
-    picFile(file, fileList){
-      // console.log("file"+JSON.stringify(file));
-      // console.log('fileList',fileList)
-      // //   this.ruleFormPicFont.file = file.raw
-      // // // fileList.forEach(function (item) {
-      // // // 	this.ruleFormPicFont.file.push(item.raw)
-      // // // })
-      // console.log(fileList);
-      // console.log(file)
-      this.sendMessageInfo.fileUrl = file
-      this.fileList = fileList
-      console.log(file.url)
-      console.log(this.fileList)
-      console.log(this.sendMessageInfo.fileUrl)
-
+//     uploadMethod(param){
+//       let _this = this
+//       console.log(param)
+//       let file = param.file
+//       let reader = new FileReader();
+//       reader.readAsText(file);
+//       // reader.readAsArrayBuffer(fileList[i]);
+// //文件读取完毕后该函数响应
+//       reader.onload = function loaded(evt) {
+//         // Handle UTF-16 file dump
+//         // _this.sendMessageInfo.fileUrl = _this.byteToString(evt.target.result)
+//         console.log(JSON.stringify(evt.target.result))
+//         _this.sendMessageInfo.fileUrl = evt.target.result
+//         console.log("\n开始发送文件");
+//         _this.sendMessageBySocket()
+//       }
+//       },
+//     byteToString(arr) {
+//       if(typeof arr === 'string') {
+//         return arr;
+//       }
+//       var str = '',
+//           _arr = arr;
+//       for(var i = 0; i < _arr.length; i++) {
+//         var one = _arr[i].toString(2),
+//             v = one.match(/^1+?(?=0)/);
+//         if(v && one.length === 8) {
+//           var bytesLength = v[0].length;
+//           var store = _arr[i].toString(2).slice(7 - bytesLength);
+//           for(var st = 1; st < bytesLength; st++) {
+//             store += _arr[st + i].toString(2).slice(2);
+//           }
+//           str += String.fromCharCode(parseInt(store, 2));
+//           i += bytesLength - 1;
+//         } else {
+//           str += String.fromCharCode(_arr[i]);
+//         }
+//       }
+//       return str;
+//     },
+    submitUpload(){
+      if(this.fileList.length===0){
+        this.uploadReturnMessage = "请先选择文件"
+        return
+      }
+      const _this = this
+      this.sendMessageInfo.senderAccount = this.userAccount
+      this.sendMessageInfo.senderName = this.userName
+      this.sendMessageInfo.sendMessage = this.sendMessage
+      this.sendMessageInfo.receiverAccount = this.fUserAccount
+      this.sendMessageInfo.receiverName = this.fUserName
+      // this.sendMessageInfo.fileUrl = this.uploadFile.name+"_"+this.uuid()
+      // this.uploadFile.name = this.uploadFile.name+new Date().getTime().toString()
+      // this.uploadFile = this.uploadFile
+      let fileName = new Date().getTime().toString()+"_"+this.uploadFile.name
+      this.sendMessageInfo.fileUrl = "src\\assets\\"+fileName
+      // let file =  this.uploadFile
+      let fileFormData  = new FormData();
+      fileFormData.append('file', this.uploadFile, fileName);//filename是键，file是值，就是要传的文件，test.zip是要传的文件名
+      let requestConfig = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+      }
+      this.axios.post('/friend/uploadFile',fileFormData, requestConfig).then(function (data) {
+          _this.uploadReturnMessage = data.data
+          _this.sendMessageBySocket()
+        })
     },
+    // beforeUploadFile(file){
+    //   // console.log('before upload')
+    //   var testmsg = file.name.substring(file.name.lastIndexOf('.')+1)
+    //   var size = file.size / 1024 / 1024
+    //   // var type=".png.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf"
+    //   var extension  = testmsg === 'png'
+    //   var extension1 = testmsg === 'jpg'
+    //   var extension2 = testmsg === 'jpeg'
+    //   var extension3 = testmsg === 'doc'
+    //   var extension4 = testmsg === 'docx'
+    //   var extension5 = testmsg === 'xls'
+    //   var extension6 = testmsg === 'xlsx'
+    //   var extension7 = testmsg === 'ppt'
+    //   var extension8 = testmsg === 'pdf'
+    //
+    //   if(!extension && !extension1&& !extension2&& !extension3&& !extension4&& !extension5&& !extension6&& !extension7&& !extension8) {
+    //     this.$message.warning({
+    //       title: '警告',
+    //       message: "只能上传.png.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf的文件"
+    //     });
+    //     return false;
+    //   }else {
+    //     if(size > 2) {
+    //       this.$message.warning({
+    //         title: '警告',
+    //         message: "文件大小不得超过2M"
+    //       });
+    //       return false;
+    //     }
+    //   }
+    //
+    //   return (extension || extension1|| extension2|| extension3|| extension4|| extension5|| extension6|| extension7|| extension8) && size
+    // },
+
     // eslint-disable-next-line no-unused-vars
     handleRemoveFile(file, fileList) {
       this.sendMessageInfo.fileUrl = file;
@@ -240,18 +312,17 @@ export default {
           console.log("当前不是这个好友")
           _this.messageRemind();
         }else{
+          console.log("收到了信息")
           _this.messageList.push(JSON.parse(evt.data))
           _this.$emit("updateNotReadMessage",JSON.parse(evt.data).senderAccount)
         }
-
-
       }
       // console.log("执行错误")
       // this.wsObj.onerror =function (evt){this.onWsError(evt)}
       // console.log("执行关闭")
       // this.wsObj.onclose = function (evt){this.onWsClose(evt)}
     },
-    sendMessageBySocket: function () {
+    sendMessageBySocket () {
       console.log("send message")
       this.sendMessageInfo.senderAccount = this.userAccount
       this.sendMessageInfo.senderName = this.userName
@@ -274,8 +345,10 @@ export default {
           "\"}"
       // this.sendMessageInfoString = JSON.stringify(this.sendMessageInfo)
 
-      // console.log(this.sendMessageInfoString)
-      this.wsObj.send(this.sendMessageInfoString)
+      this.wsObj.send(JSON.stringify(this.sendMessageInfo))
+      this.sendMessageInfo.fileUrl=''
+      // this.uploadFile=''
+      // this.wsObj.send(this.sendMessageInfoString)
     },
     messageRemind(){
       // eslint-disable-next-line no-undef
