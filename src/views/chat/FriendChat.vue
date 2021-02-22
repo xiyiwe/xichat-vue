@@ -15,7 +15,7 @@
               <div>
                 <el-image
                     style="width: 100px; height: 100px"
-                   :src="imgDemo"
+                    src="/favicon.ico"
                 ></el-image>
               </div>
               <!-- recordContent 聊天记录数组-->
@@ -26,6 +26,8 @@
                   <div class="info">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                     <p class="info-content">{{messages.messageContent}}</p>
+                    <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
+                    <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                   </div>
                 </div>
                 <!-- 我的 -->
@@ -33,8 +35,8 @@
                   <div class="info-my">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                     <div class="info-content-my">{{messages.messageContent}}</div>
-                    <a :href="messages.fileUrl">{{messages.fileUrl}}</a>
-<!--                    <img :src="messages.fileUrl">-->
+                    <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
+                    <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                   </div>
                 </div>
               </div>
@@ -54,18 +56,21 @@
                       <div v-for="(messages,index) in historyMessageList" :key="index" >
                         <!-- 对方 -->
                         <div class="word" v-if="userAccount!==messages.senderAccount">
-                          <!--                  <img :src="messages.imgUrl">-->
+<!--                          <img v-if="messages.fileUrl!=null && messages.fileUrl!==''" :src="messages.fileUrl" :onerror="imgDemo">-->
                           <div class="info">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                             <p class="info-content">{{messages.messageContent}}</p>
-<!--                            <img :src="messages.fileUrl">-->
+                            <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
+                            <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                           </div>
                         </div>
                         <!-- 我的 -->
                         <div class="word-my" v-else>
                           <div class="info-my">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                            <div class="info-content-my">{{messages.messageContent}}</div>
+                            <p class="info-content-my">{{messages.messageContent}}</p>
+                            <a v-if="messages.fileType===''" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
+                            <img v-if="messages.fileType!==''" :src="messages.fileUrl" >
                           </div>
                         </div>
                       </div>
@@ -130,9 +135,9 @@ export default {
   name: "FriendChat",
   data() {
     return {
-      imgDemo:'C:\\zyz\\biyesheji\\xichat\\xichat-vue\\xichat-vue\\src\\static\\logo.png',
+      // imgDemo:require('C:\\zyz\\biyesheji\\xichat\\xichat-vue\\xichat-vue\\src\\static\\logo.png'),
       // actionUrl:'D:\\itemRepository\\gitRepository\\xichat-vue\\src\\files\\',
-      limitFile:1,
+      // limitFile:1,
       fileList:[],
       historyMessageCount:0,
       historyCurrentPage:1,
@@ -149,7 +154,9 @@ export default {
         senderName:'',
         receiverAccount:'',
         receiverName:'',
-        fileUrl:''
+        fileUrl:'',
+        fileName:'',
+        fileType:'',
       },
 
       uploadReturnMessage:'',
@@ -171,66 +178,33 @@ export default {
     }
   },
   methods:{
-
+    openFile(eve){
+      window.open(eve)
+    },
     getFile(event){
       var file = event.target.files;
       // this.uploadFile=file[0]
       for(var i = 0;i<file.length;i++){
         //    上传类型判断
         this.uploadFile=file[0]
+
         var imgName = file[i].name;
         var idx = imgName.lastIndexOf(".");
         if (idx != -1){
           var ext = imgName.substr(idx+1).toUpperCase();
           ext = ext.toLowerCase( );
-          if (ext!='pdf' && ext!='doc' && ext!='docx' && ext!='png'){
+          if (ext!='pdf' && ext!='doc' && ext!='docx' && ext!='png' ){
               return false
+          }else if(this.uploadFile.name.indexOf("%") !== -1){
+            this.uploadReturnMessage = "文件名不能含有%"
+            return false
           }else{
             this.fileList.push(file[i]);
           }
         }
       }
     },
-//     uploadMethod(param){
-//       let _this = this
-//       console.log(param)
-//       let file = param.file
-//       let reader = new FileReader();
-//       reader.readAsText(file);
-//       // reader.readAsArrayBuffer(fileList[i]);
-// //文件读取完毕后该函数响应
-//       reader.onload = function loaded(evt) {
-//         // Handle UTF-16 file dump
-//         // _this.sendMessageInfo.fileUrl = _this.byteToString(evt.target.result)
-//         console.log(JSON.stringify(evt.target.result))
-//         _this.sendMessageInfo.fileUrl = evt.target.result
-//         console.log("\n开始发送文件");
-//         _this.sendMessageBySocket()
-//       }
-//       },
-//     byteToString(arr) {
-//       if(typeof arr === 'string') {
-//         return arr;
-//       }
-//       var str = '',
-//           _arr = arr;
-//       for(var i = 0; i < _arr.length; i++) {
-//         var one = _arr[i].toString(2),
-//             v = one.match(/^1+?(?=0)/);
-//         if(v && one.length === 8) {
-//           var bytesLength = v[0].length;
-//           var store = _arr[i].toString(2).slice(7 - bytesLength);
-//           for(var st = 1; st < bytesLength; st++) {
-//             store += _arr[st + i].toString(2).slice(2);
-//           }
-//           str += String.fromCharCode(parseInt(store, 2));
-//           i += bytesLength - 1;
-//         } else {
-//           str += String.fromCharCode(_arr[i]);
-//         }
-//       }
-//       return str;
-//     },
+
     submitUpload(){
       if(this.fileList.length===0){
         this.uploadReturnMessage = "请先选择文件"
@@ -246,8 +220,13 @@ export default {
       // this.uploadFile.name = this.uploadFile.name+new Date().getTime().toString()
       // this.uploadFile = this.uploadFile
       let fileName = new Date().getTime().toString()+"_"+this.uploadFile.name
-      this.sendMessageInfo.fileUrl = "src\\assets\\"+fileName
+      // this.sendMessageInfo.fileUrl = "C:\\zyz\\biyesheji\\xichat\\xichat-vue\\xichat-vue\\src\\static\\"+fileName
       // let file =  this.uploadFile
+      if (this.uploadFile.type!==""){
+        this.sendMessageInfo.fileUrl = "/static/images/"+fileName
+      }else{
+        this.sendMessageInfo.fileUrl = "/static/files/"+fileName
+      }
       let fileFormData  = new FormData();
       fileFormData.append('file', this.uploadFile, fileName);//filename是键，file是值，就是要传的文件，test.zip是要传的文件名
       let requestConfig = {
@@ -255,6 +234,9 @@ export default {
           'Content-Type': 'multipart/form-data'
         },
       }
+      console.log(this.uploadFile)
+      this.sendMessageInfo.fileName = this.uploadFile.name
+      this.sendMessageInfo.fileType = this.uploadFile.type
       this.axios.post('/friend/uploadFile',fileFormData, requestConfig).then(function (data) {
           _this.uploadReturnMessage = data.data
           _this.sendMessageBySocket()
@@ -347,6 +329,8 @@ export default {
 
       this.wsObj.send(JSON.stringify(this.sendMessageInfo))
       this.sendMessageInfo.fileUrl=''
+      this.sendMessageInfo.fileType=''
+      this.sendMessageInfo.fileName=''
       // this.uploadFile=''
       // this.wsObj.send(this.sendMessageInfoString)
     },
@@ -498,11 +482,11 @@ export default {
   justify-content:flex-end;
   margin-bottom: 20px;
 }
-img{
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
+/*img{*/
+/*  width: 40px;*/
+/*  height: 40px;*/
+/*  border-radius: 50%;*/
+/*}*/
 .info{
   margin-left: 10px;}
 .time{
@@ -520,11 +504,11 @@ img{
   margin-bottom: 20px;
   text-align: right;
 }
-img{
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
+/*img{*/
+/*  width: 40px;*/
+/*  height: 40px;*/
+/*  border-radius: 50%;*/
+/*}*/
 .info{
   width: 90%;
   margin-right: 10px;
