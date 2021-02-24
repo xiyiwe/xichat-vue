@@ -17,10 +17,12 @@
         <el-submenu index="3">
           <template slot="title">群聊菜单</template>
           <el-menu-item index="/addGroup">新建群聊</el-menu-item>
+          <el-menu-item index="/joinGroup">加入群聊</el-menu-item>
           <el-submenu index="4">
             <template slot="title">群聊列表</template>
             <el-menu-item index="/groupChat" v-for="(item) in groupList"  :key="item.groupName" @click="pushGroupInfo(item.groupId,item.groupName)">
               {{item.groupName}}
+              <span style="color: red" v-if="item.notReadMessageCount!=='0'">{{ item.notReadMessageCount }}</span>
             </el-menu-item>
           </el-submenu>
         </el-submenu>
@@ -41,7 +43,10 @@
       </el-header>
 
       <el-main>
-        <router-view @updateFriendListAndNotReadMessage="updateFriendListAndNotReadMessage"></router-view>
+        <router-view @updateFriendListAndNotReadMessage="updateFriendListAndNotReadMessage"
+        @updateGroupListAndNotReadMessage="updateGroupListAndNotReadMessage">
+
+        </router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -57,23 +62,13 @@ export default {
       currentFUserAccount:'',
       groupList:[],
       friendsList:[],
-      notReadMessageCount:0,
-      notReadPersonList:[]
+      // notReadMessageCount:0,
+      notReadPersonList:[],
+      notReadGroupList:[]
   };
 },
   methods:{
-    // updateNotReadMessage(){
-    //   const _this = this
-    //   this.axios({
-    //     url:'/friend/getNotReadMessageCountFromFriend'+,
-    //     method: 'get',
-    //     headers: {
-    //       Authorization: sessionStorage.token
-    //     }
-    //   }).then(function (resp){
-    //     _this.friendsList = resp.data
-    //   })
-    // },
+
     logout(){
       const _this = this
       this.axios({
@@ -82,9 +77,6 @@ export default {
         headers: {
         Authorization: sessionStorage.token
       }
-      // beforeSend : function(request) {
-      //     request.setRequestHeader("Authorization", sessionStorage.token);
-      //   }
       }).then(function () {
         sessionStorage.setItem("userName", "")
         sessionStorage.setItem("Authorization", "")
@@ -94,7 +86,8 @@ export default {
     },
     pushGroupInfo(groupId,groupName){
       this.$router.push(
-          {path:'/groupChat',
+          {
+            path:'/groupChat/'+groupId,
             query:{
               currentGroupName:groupName,
               currentGroupId:groupId
@@ -103,13 +96,6 @@ export default {
     },
     //点击左侧好友
     pushFriendInfo(fUserAccount,fUserName){
-      // if(this.currentFUserAccount===''){
-      //   this.currentFUserAccount = fUserAccount
-      // }
-      // console.log(fUserAccount)
-      // console.log(this.currentFUserAccount)
-      // if(fUserAccount!==this.currentFUserAccount)
-      // {
         this.$router.push(
             {
               path:'/friendChat/'+fUserAccount,
@@ -119,12 +105,6 @@ export default {
               }
             }
         )
-      // }
-      // this.$forceUpdate()
-    },
-    pushUpdateMethod(fUserAccount){
-      this.updateNotReadMessage(fUserAccount)
-      this.updateFriendListAndNotReadMessage()
     },
     //更新单个好友左侧未读信息数量
     updateNotReadMessage(fUserAccount){
@@ -141,7 +121,6 @@ export default {
     //查询所有好友发来的未读消息数量和好友信息
     updateFriendListAndNotReadMessage(){
       const _this = this
-      // console.log("调用了updateFriendListAndNotReadMessage")
       _this.axios({
         url:'/friend/getUserFriendsAndNotReadMessage',
         method: 'get',
@@ -151,31 +130,39 @@ export default {
       }).then(resp=> {
         this.friendsList = resp.data
       })
-    }
+    },
+    //查询所有群组发来的未读消息数量和群组信息
+    updateGroupListAndNotReadMessage(){
+      const _this = this
+      this.axios({
+        url:'/group/getUserGroupsAndNotReadMessageCount',
+        method: 'get',
+        headers: {
+          Authorization: sessionStorage.token
+        }
+      }).then(function (resp){
+        _this.groupList = resp.data
+      })
+    },
+    //更新单个群组左侧未读信息数量
+    updateGroupNotReadMessage(groupId){
+      console.log("updateGroupNotReadMessage")
+      const _this = this
+      _this.axios({
+        url:'/group/updateGroupNotReadMessage/'+groupId,
+        method: 'get',
+        headers: {
+          Authorization: sessionStorage.token
+        }
+      })
+    },
   },
   mounted() {
     const _this = this
     _this.user = sessionStorage.getItem("userName")
-    // _this.updateFriendListAndNotReadMessage()
     _this.updateFriendListAndNotReadMessage()
-    // this.axios({
-    //   url:'/friend/getUserFriends',
-    //   method: 'get',
-    //   headers: {
-    //     Authorization: sessionStorage.token
-    //   }
-    // }).then(function (resp){
-    //   _this.friendsList = resp.data
-    // })
-    this.axios({
-      url:'/group/getUserGroup',
-      method: 'get',
-      headers: {
-        Authorization: sessionStorage.token
-      }
-    }).then(function (resp){
-      _this.groupList = resp.data.allGroup
-    })
+    _this.updateGroupListAndNotReadMessage()
+
   }
 }
 </script>

@@ -157,6 +157,8 @@ export default {
         fileUrl:'',
         fileName:'',
         fileType:'',
+        isGroup:'0'
+
       },
 
       uploadReturnMessage:'',
@@ -290,9 +292,9 @@ export default {
         console.log("WebSocket is open now.");
       }
       this.wsObj.onmessage = function (evt){
-        if (JSON.parse(evt.data).senderAccount!==_this.fUserAccount&&JSON.parse(evt.data).senderAccount !== _this.userAccount ){
+        if ((JSON.parse(evt.data).senderAccount!==_this.fUserAccount&&JSON.parse(evt.data).senderAccount !== _this.userAccount )||JSON.parse(evt.data).isGroup==='1' ){
           console.log("当前不是这个好友")
-          _this.messageRemind();
+          _this.messageRemind(JSON.parse(evt.data));
         }else{
           console.log("收到了信息")
           _this.messageList.push(JSON.parse(evt.data))
@@ -331,13 +333,23 @@ export default {
       this.sendMessageInfo.fileUrl=''
       this.sendMessageInfo.fileType=''
       this.sendMessageInfo.fileName=''
-      // this.uploadFile=''
+      this.uploadFile=''
       // this.wsObj.send(this.sendMessageInfoString)
     },
-    messageRemind(){
-      // eslint-disable-next-line no-undef
-      console.log("调用了messageRemind")
-      this.$emit("updateFriendListAndNotReadMessage")
+    // messageRemind(){
+    //   // eslint-disable-next-line no-undef
+    //   console.log("调用了messageRemind")
+    //   this.$emit("updateFriendListAndNotReadMessage")
+    // },
+    messageRemind(eve) {
+      console.log("好友页面"+eve)
+      if (eve.isGroup === '1') {
+        console.log("调用了messageGroupRemind")
+        this.$emit("updateGroupListAndNotReadMessage")
+      } else {
+        console.log("调用了updateFriendListAndNotReadMessage")
+        this.$emit("updateFriendListAndNotReadMessage")
+      }
     },
     getNotReadMessage(fUserAccount) {
       const _this = this
@@ -373,7 +385,13 @@ export default {
       })
     }
   },
-
+  beforeDestroy() {
+    this.wsObj.onclose=(evt)=>{
+      console.log(evt)
+    }
+    this.wsObj.close()
+    this.close()
+  },
   mounted() {
     this.userAccount = sessionStorage.getItem("userAccount")
     this.userName = sessionStorage.getItem("userName")
@@ -382,7 +400,7 @@ export default {
     this.wsUri = 'ws://localhost:8100/friendsChat/'+this.userAccount
     this.wsObj = new WebSocket(this.wsUri)
     this.createWebSocket()
-    this.getNotReadMessage(this.fUserAccount)
+    // this.getNotReadMessage(this.fUserAccount)
     this.getHistoryMessageByPage(1)
   },
   beforeRouteEnter  (to, from, next) {
@@ -412,8 +430,6 @@ export default {
               Authorization: sessionStorage.token
             }
           })
-          // _vm.$emit("updateNotReadMessage",_vm.$route.query.currentFUserAccount)
-          // _vm.$emit("updateFriendListAndNotReadMessage")
     })
     },
     // 在当前路由改变，但是该组件被复用时调用
@@ -423,24 +439,10 @@ export default {
   beforeRouteLeave (to, from, next) {
     this.$emit("updateFriendListAndNotReadMessage")
     next(
-    //     vm => {
-    //   vm.$emit("updateNotReadMessage",vm.$route.query.currentFUserAccount)
-    //   vm.$emit("updateFriendListAndNotReadMessage")
-    // }
     )
     // 导航离开该组件的对应路由时调用
     // 可以访问组件实例 `this`
   }
-
-  // directives: {/*这个是vue的自定义指令,官方文档有详细说明*/
-  //   // 发送消息后滚动到底部,这里无法使用原作者的方法，也未找到合理的方法解决，暂用setTimeout的方法模拟
-  //   'scroll-bottom'(el) {
-  //     //console.log(el.scrollTop);
-  //     setTimeout(function () {
-  //       el.scrollTop += 9999;
-  //     }, 1)
-  //   }
-  // }
 }
 </script>
 

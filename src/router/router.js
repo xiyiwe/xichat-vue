@@ -7,6 +7,7 @@ import GroupChat from "@/views/chat/GroupChat";
 import Register from "@/views/regist/Register";
 import AddStudent from "@/components/friend/AddStudent";
 import AddGroup from "@/components/group/AddGroup";
+import JoinGroup from "@/components/group/JoinGroup";
 Vue.use(Router)
 
 export default new Router({
@@ -52,7 +53,12 @@ export default new Router({
           component: AddGroup
         },
         {
-          path: '/groupChat',
+          path: '/joinGroup',
+          name: 'JoinGroup',
+          component: JoinGroup
+        },
+        {
+          path: '/groupChat/:groupId',
           name: 'GroupChat',
           component: GroupChat
         }
