@@ -4,7 +4,11 @@
       <el-header>
         <p >
           当前聊天用户:{{this.$route.query.currentFUserName}}
+          账号:{{this.$route.query.currentFUserAccount}}
         </p>
+<!--        <p>-->
+<!--          当前状态:{{this.onlineStatus}}-->
+<!--        </p>-->
       </el-header>
       <el-container>
 <!--        <el-aside ></el-aside>-->
@@ -13,10 +17,10 @@
             <el-scrollbar >
             <div class="chat-content" >
               <div>
-                <el-image
-                    style="width: 100px; height: 100px"
-                    src="/favicon.ico"
-                ></el-image>
+<!--                <el-image-->
+<!--                    style="width: 100px; height: 100px"-->
+<!--                    src="/favicon.ico"-->
+<!--                ></el-image>-->
               </div>
               <!-- recordContent 聊天记录数组-->
               <div v-for="(messages,index) in messageList" :key="index" >
@@ -88,7 +92,7 @@
           </el-main>
           <el-footer>
             <div>
-              <el-input type="text" placeholder="请输入消息" v-model="sendMessage" style="width: 50%"/>
+              <el-input type="text" placeholder="请输入消息" maxlength="40" v-model="sendMessage" style="width: 50%"/>
               <el-button type="primary"  @click="sendMessageBySocket()" >发送消息</el-button>
               <el-button @click="messageHistoryDrawer = true;getHistoryMessageByPage(1)" type="primary" style="margin-top: 10px;float: right" >
                 历史记录
@@ -138,6 +142,7 @@ export default {
       // imgDemo:require('C:\\zyz\\biyesheji\\xichat\\xichat-vue\\xichat-vue\\src\\static\\logo.png'),
       // actionUrl:'D:\\itemRepository\\gitRepository\\xichat-vue\\src\\files\\',
       // limitFile:1,
+      // onlineStatus:'不在线',
       fileList:[],
       historyMessageCount:0,
       historyCurrentPage:1,
@@ -291,6 +296,7 @@ export default {
       this.wsObj.onopen=function (event) {
         console.log("WebSocket is open now.");
       }
+      // this.onlineStatus='在线'
       this.wsObj.onmessage = function (evt){
         if ((JSON.parse(evt.data).senderAccount!==_this.fUserAccount&&JSON.parse(evt.data).senderAccount !== _this.userAccount )||JSON.parse(evt.data).isGroup==='1' ){
           console.log("当前不是这个好友")
@@ -333,21 +339,14 @@ export default {
       this.sendMessageInfo.fileUrl=''
       this.sendMessageInfo.fileType=''
       this.sendMessageInfo.fileName=''
-      this.uploadFile=''
+      // this.uploadFile=''
       // this.wsObj.send(this.sendMessageInfoString)
     },
-    // messageRemind(){
-    //   // eslint-disable-next-line no-undef
-    //   console.log("调用了messageRemind")
-    //   this.$emit("updateFriendListAndNotReadMessage")
-    // },
+
     messageRemind(eve) {
-      console.log("好友页面"+eve)
       if (eve.isGroup === '1') {
-        console.log("调用了messageGroupRemind")
         this.$emit("updateGroupListAndNotReadMessage")
       } else {
-        console.log("调用了updateFriendListAndNotReadMessage")
         this.$emit("updateFriendListAndNotReadMessage")
       }
     },
@@ -386,18 +385,18 @@ export default {
     }
   },
   beforeDestroy() {
+    // this.onlineStatus='不在线'
     this.wsObj.onclose=(evt)=>{
       console.log(evt)
     }
     this.wsObj.close()
-    this.close()
   },
   mounted() {
     this.userAccount = sessionStorage.getItem("userAccount")
     this.userName = sessionStorage.getItem("userName")
     this.fUserAccount = this.$route.query.currentFUserAccount
     this.fUserName = this.$route.query.currentFUserName
-    this.wsUri = 'ws://localhost:8100/friendsChat/'+this.userAccount
+    this.wsUri = 'ws://localhost:8100/chat/'+this.userAccount
     this.wsObj = new WebSocket(this.wsUri)
     this.createWebSocket()
     // this.getNotReadMessage(this.fUserAccount)

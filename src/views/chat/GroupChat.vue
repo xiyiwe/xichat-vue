@@ -4,6 +4,7 @@
       <el-header>
         <p >
           当前聊天群:{{this.$route.query.currentGroupName}}
+          群号：{{this.$route.query.currentGroupId}}
         </p>
       </el-header>
       <el-container>
@@ -88,7 +89,7 @@
           </el-main>
           <el-footer>
             <div>
-              <el-input type="text" placeholder="请输入消息" v-model="sendMessage" style="width: 50%"/>
+              <el-input type="text" placeholder="请输入消息" maxlength="40" v-model="sendMessage" style="width: 50%"/>
               <el-button type="primary"  @click="sendMessageBySocket()" >发送消息</el-button>
               <el-button @click="messageHistoryDrawer = true;getHistoryMessageByPage(1)" type="primary" style="margin-top: 10px;float: right" >
                 历史记录
@@ -227,6 +228,7 @@ export default {
         this.sendMessageInfo.fileUrl = "/static/files/"+fileName
       }
       let fileFormData  = new FormData();
+      console.log(this.uploadFile)
       fileFormData.append('file', this.uploadFile, fileName);//filename是键，file是值，就是要传的文件，test.zip是要传的文件名
       let requestConfig = {
         headers: {
@@ -333,7 +335,7 @@ export default {
       this.sendMessageInfo.fileUrl=''
       this.sendMessageInfo.fileType=''
       this.sendMessageInfo.fileName=''
-      this.uploadFile=''
+      // this.uploadFile=''
       // this.wsObj.send(this.sendMessageInfoString)
     },
     messageRemind(eve){
@@ -381,13 +383,19 @@ export default {
       })
     }
   },
-
+  beforeDestroy() {
+    // this.onlineStatus='不在线'
+    this.wsObj.onclose=(evt)=>{
+      console.log(evt)
+    }
+    this.wsObj.close()
+  },
   mounted() {
     this.userAccount = sessionStorage.getItem("userAccount")
     this.userName = sessionStorage.getItem("userName")
     this.groupId = this.$route.query.currentGroupId
     this.groupName = this.$route.query.currentGroupName
-    this.wsUri = 'ws://localhost:8100/friendsChat/'+this.userAccount
+    this.wsUri = 'ws://localhost:8100/chat/'+this.userAccount
     this.wsObj = new WebSocket(this.wsUri)
     this.createWebSocket()
     // this.getNotReadMessage(this.groupId)

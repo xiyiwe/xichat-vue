@@ -64,10 +64,6 @@ export default {
     },
     // 加密
     encrypt (word) {
-      // let _this = this
-      // let key = CryptoJS.enc.Utf8.parse(_this.CRYPTOJSKEY)
-      // let srcs = CryptoJS.enc.Utf8.parse(word)
-      // let encrypted = CryptoJS.AES.encrypt(srcs, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7})
       return cryptoAES.encrypt(word)
     },
     // 解密

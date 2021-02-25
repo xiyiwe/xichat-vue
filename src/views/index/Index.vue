@@ -11,6 +11,14 @@
             <el-menu-item index="/friendChat/" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">
               {{item.userName}}
               <span style="color: red" v-if="item.notReadMessageCount!=='0'">{{ item.notReadMessageCount }}</span>
+              <el-dropdown>
+                 <span class="el-dropdown-link">
+                  <i class="el-icon-arrow-down el-icon--right"></i>
+                 </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item @click.native="deleteFriend(item.userAccount)">删除好友</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
             </el-menu-item>
           </el-submenu>
         </el-submenu>
@@ -23,6 +31,14 @@
             <el-menu-item index="/groupChat" v-for="(item) in groupList"  :key="item.groupName" @click="pushGroupInfo(item.groupId,item.groupName)">
               {{item.groupName}}
               <span style="color: red" v-if="item.notReadMessageCount!=='0'">{{ item.notReadMessageCount }}</span>
+              <el-dropdown>
+                 <span class="el-dropdown-link">
+                  <i class="el-icon-arrow-down el-icon--right"></i>
+                 </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item @click.native="deleteGroup(item.groupId)">退出群组</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
             </el-menu-item>
           </el-submenu>
         </el-submenu>
@@ -44,7 +60,9 @@
 
       <el-main>
         <router-view @updateFriendListAndNotReadMessage="updateFriendListAndNotReadMessage"
-        @updateGroupListAndNotReadMessage="updateGroupListAndNotReadMessage">
+        @updateGroupListAndNotReadMessage="updateGroupListAndNotReadMessage"
+        @updateGroupNotReadMessage="updateGroupNotReadMessage"
+        @@updateNotReadMessage="updateNotReadMessage" >
 
         </router-view>
       </el-main>
@@ -68,7 +86,30 @@ export default {
   };
 },
   methods:{
-
+    deleteFriend(fUserAccount){
+      const _this = this
+      this.axios({
+            url: '/friend/deleteFriend/'+fUserAccount,
+            method: 'get',
+            headers: {
+              Authorization: sessionStorage.token
+            }
+    }).then(function () {
+        _this.updateFriendListAndNotReadMessage()
+      })
+    },
+    deleteGroup(groupId){
+      const _this = this
+      this.axios({
+        url: '/group/quitGroup/'+groupId,
+        method: 'get',
+        headers: {
+          Authorization: sessionStorage.token
+        }
+      }).then(function () {
+        _this.updateGroupListAndNotReadMessage()
+      })
+    },
     logout(){
       const _this = this
       this.axios({
