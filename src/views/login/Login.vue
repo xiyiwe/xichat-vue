@@ -68,9 +68,6 @@ export default {
     },
     // 解密
     decrypt (word) {
-      // const _this = this
-      // let key = CryptoJS.enc.Utf8.parse(_this.CRYPTOJSKEY)
-      // let decrypt = CryptoJS.AES.decrypt(word, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7})
       return cryptoAES.decrypt(word)
     },
     onSubmit (formName) {

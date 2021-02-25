@@ -10,7 +10,7 @@
       <el-container>
         <!--        <el-aside ></el-aside>-->
         <el-container>
-          <el-main style="height:500px;flex-grow:1;">
+          <el-main style="height:400px;flex-grow:1;">
             <el-scrollbar >
               <div class="chat-content" >
                 <div>
@@ -26,7 +26,7 @@
                     <!--                  <img :src="messages.fileUrl">-->
                     <div class="info">
                       <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                      <p class="info-content">{{messages.messageContent}}</p>
+                      <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
                       <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
                       <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                     </div>
@@ -35,7 +35,7 @@
                   <div class="word-my" v-else>
                     <div class="info-my">
                       <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                      <div class="info-content-my">{{messages.messageContent}}</div>
+                      <div class="info-content-my">{{messages.messageContent | decryptMessage}}</div>
                       <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
                       <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                     </div>
@@ -60,7 +60,7 @@
                         <!--                          <img v-if="messages.fileUrl!=null && messages.fileUrl!==''" :src="messages.fileUrl" :onerror="imgDemo">-->
                         <div class="info">
                           <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                          <p class="info-content">{{messages.messageContent}}</p>
+                          <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
                           <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
                           <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                         </div>
@@ -69,7 +69,7 @@
                       <div class="word-my" v-else>
                         <div class="info-my">
                           <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                          <p class="info-content-my">{{messages.messageContent}}</p>
+                          <p class="info-content-my">{{messages.messageContent | decryptMessage}}</p>
                           <a v-if="messages.fileType===''" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
                           <img v-if="messages.fileType!==''" :src="messages.fileUrl" >
                         </div>
@@ -129,6 +129,7 @@
 
 <script>
 import {formatDate} from "@/utils/formatDate";
+import cryptoAES from "@/utils/js/cryptoAES";
 
 export default {
   name: "GroupChat",
@@ -175,9 +176,20 @@ export default {
     formatDate(time) {
       let date = new Date(time);
       return formatDate(date, 'yyyy年MM月dd日 hh:mm:ss');
+    },
+    decryptMessage(message){
+      return cryptoAES.decrypt(message)
     }
   },
   methods:{
+    // 加密
+    encrypt (word) {
+      return cryptoAES.encrypt(word)
+    },
+    // 解密
+    decrypt (word) {
+      return cryptoAES.decrypt(word)
+    },
     openFile(eve){
       window.open(eve)
     },
@@ -311,7 +323,7 @@ export default {
       console.log("send message")
       this.sendMessageInfo.senderAccount = this.userAccount
       this.sendMessageInfo.senderName = this.userName
-      this.sendMessageInfo.sendMessage = this.sendMessage
+      this.sendMessageInfo.sendMessage = this.encrypt(this.sendMessage)
       this.sendMessageInfo.receiverAccount = this.groupId
       this.sendMessageInfo.receiverName = this.groupName
       this.sendMessageInfo.groupId= this.groupId

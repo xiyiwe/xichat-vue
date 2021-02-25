@@ -13,7 +13,7 @@
       <el-container>
 <!--        <el-aside ></el-aside>-->
         <el-container>
-          <el-main style="height:500px;flex-grow:1;">
+          <el-main style="height:450px;flex-grow:1;">
             <el-scrollbar >
             <div class="chat-content" >
               <div>
@@ -29,7 +29,7 @@
 <!--                  <img :src="messages.fileUrl">-->
                   <div class="info">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                    <p class="info-content">{{messages.messageContent}}</p>
+                    <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
                     <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
                     <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                   </div>
@@ -38,7 +38,7 @@
                 <div class="word-my" v-else>
                   <div class="info-my">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                    <div class="info-content-my">{{messages.messageContent}}</div>
+                    <div class="info-content-my">{{messages.messageContent | decryptMessage}}</div>
                     <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
                     <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                   </div>
@@ -63,7 +63,7 @@
 <!--                          <img v-if="messages.fileUrl!=null && messages.fileUrl!==''" :src="messages.fileUrl" :onerror="imgDemo">-->
                           <div class="info">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                            <p class="info-content">{{messages.messageContent}}</p>
+                            <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
                             <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
                             <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                           </div>
@@ -72,7 +72,7 @@
                         <div class="word-my" v-else>
                           <div class="info-my">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                            <p class="info-content-my">{{messages.messageContent}}</p>
+                            <p class="info-content-my">{{messages.messageContent | decryptMessage}}</p>
                             <a v-if="messages.fileType===''" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
                             <img v-if="messages.fileType!==''" :src="messages.fileUrl" >
                           </div>
@@ -134,14 +134,11 @@
 
 <script>
 import {formatDate} from "@/utils/formatDate";
-
+import cryptoAES from '../../utils/js/cryptoAES'
 export default {
   name: "FriendChat",
   data() {
     return {
-      // imgDemo:require('C:\\zyz\\biyesheji\\xichat\\xichat-vue\\xichat-vue\\src\\static\\logo.png'),
-      // actionUrl:'D:\\itemRepository\\gitRepository\\xichat-vue\\src\\files\\',
-      // limitFile:1,
       // onlineStatus:'不在线',
       fileList:[],
       historyMessageCount:0,
@@ -182,9 +179,20 @@ export default {
     formatDate(time) {
       let date = new Date(time);
       return formatDate(date, 'yyyy年MM月dd日 hh:mm:ss');
+    },
+    decryptMessage(message){
+      return cryptoAES.decrypt(message)
     }
   },
   methods:{
+    // 加密
+    encrypt (word) {
+      return cryptoAES.encrypt(word)
+    },
+    // 解密
+    decrypt (word) {
+      return cryptoAES.decrypt(word)
+    },
     openFile(eve){
       window.open(eve)
     },
@@ -316,23 +324,24 @@ export default {
       console.log("send message")
       this.sendMessageInfo.senderAccount = this.userAccount
       this.sendMessageInfo.senderName = this.userName
-      this.sendMessageInfo.sendMessage = this.sendMessage
+      // this.sendMessageInfo.sendMessage = this.sendMessage
+      this.sendMessageInfo.sendMessage = this.encrypt(this.sendMessage)
       this.sendMessageInfo.receiverAccount = this.fUserAccount
       this.sendMessageInfo.receiverName = this.fUserName
-      this.sendMessageInfoString = "{"+
-          "\"sendMessage\":\""+
-          this.sendMessageInfo.sendMessage+
-          "\",\"senderAccount\":\""+
-          this.sendMessageInfo.senderAccount+
-          "\",\"senderName\":\""+
-          this.sendMessageInfo.senderName+
-          "\",\"receiverAccount\":\""+
-          this.sendMessageInfo.receiverAccount+
-          "\",\"receiverName\":\""+
-          this.sendMessageInfo.receiverName+
-          "\",\"fileUrl\":\""+
-          this.sendMessageInfo.fileUrl+
-          "\"}"
+      // this.sendMessageInfoString = "{"+
+      //     "\"sendMessage\":\""+
+      //     this.sendMessageInfo.sendMessage+
+      //     "\",\"senderAccount\":\""+
+      //     this.sendMessageInfo.senderAccount+
+      //     "\",\"senderName\":\""+
+      //     this.sendMessageInfo.senderName+
+      //     "\",\"receiverAccount\":\""+
+      //     this.sendMessageInfo.receiverAccount+
+      //     "\",\"receiverName\":\""+
+      //     this.sendMessageInfo.receiverName+
+      //     "\",\"fileUrl\":\""+
+      //     this.sendMessageInfo.fileUrl+
+      //     "\"}"
       // this.sendMessageInfoString = JSON.stringify(this.sendMessageInfo)
 
       this.wsObj.send(JSON.stringify(this.sendMessageInfo))
