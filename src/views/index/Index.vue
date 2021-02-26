@@ -169,7 +169,7 @@ export default {
           Authorization: sessionStorage.token
         }
       }).then(resp=> {
-        this.friendsList = resp.data
+        _this.friendsList = resp.data
       })
     },
     //查询所有群组发来的未读消息数量和群组信息
@@ -199,6 +199,13 @@ export default {
     },
   },
   mounted() {
+    if(sessionStorage.getItem("token")===null){
+      this.$router.push(
+          {
+            path:'/',
+          }
+      )
+    }
     const _this = this
     _this.user = sessionStorage.getItem("userName")
     _this.updateFriendListAndNotReadMessage()

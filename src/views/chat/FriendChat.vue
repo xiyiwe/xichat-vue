@@ -354,8 +354,10 @@ export default {
 
     messageRemind(eve) {
       if (eve.isGroup === '1') {
+        console.log("调用了updateGroupListAndNotReadMessage")
         this.$emit("updateGroupListAndNotReadMessage")
       } else {
+        console.log("updateFriendListAndNotReadMessage")
         this.$emit("updateFriendListAndNotReadMessage")
       }
     },
@@ -401,6 +403,13 @@ export default {
     this.wsObj.close()
   },
   mounted() {
+    // if(sessionStorage.getItem("token")===null){
+    //   this.$router.push(
+    //       {
+    //         path:'/',
+    //       }
+    //   )
+    // }
     this.userAccount = sessionStorage.getItem("userAccount")
     this.userName = sessionStorage.getItem("userName")
     this.fUserAccount = this.$route.query.currentFUserAccount
@@ -409,6 +418,7 @@ export default {
     this.wsObj = new WebSocket(this.wsUri)
     this.createWebSocket()
     // this.getNotReadMessage(this.fUserAccount)
+    this.$emit("updateFriendListAndNotReadMessage")
     this.getHistoryMessageByPage(1)
   },
   beforeRouteEnter  (to, from, next) {

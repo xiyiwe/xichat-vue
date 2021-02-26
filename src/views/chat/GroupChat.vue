@@ -403,6 +403,7 @@ export default {
     this.wsObj.close()
   },
   mounted() {
+
     this.userAccount = sessionStorage.getItem("userAccount")
     this.userName = sessionStorage.getItem("userName")
     this.groupId = this.$route.query.currentGroupId
@@ -412,12 +413,14 @@ export default {
     this.createWebSocket()
     // this.getNotReadMessage(this.groupId)
     this.getHistoryMessageByPage(1)
+    this.$emit("updateGroupListAndNotReadMessage")
   },
   beforeRouteEnter  (to, from, next) {
     // this.messageList = []
     // this.getNotReadMessage(this.$route.query.currentgroupId)
     next(
         vm=> {
+          console.log("调用了beforeRouteEnter")
           vm.groupId = vm.$route.query.currentGroupId
           vm.groupName = vm.$route.query.currentGroupName
           vm.historyCurrentPage=1
@@ -445,6 +448,7 @@ export default {
   // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
   // 可以访问组件实例 `this`
   beforeRouteLeave (to, from, next) {
+    console.log("调用了beforeRouteLeave")
     this.$emit("updateGroupListAndNotReadMessage")
     next(
     )
