@@ -70,8 +70,8 @@
                         <div class="info-my">
                           <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                           <p class="info-content-my">{{messages.messageContent | decryptMessage}}</p>
-                          <a v-if="messages.fileType===''" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
-                          <img v-if="messages.fileType!==''" :src="messages.fileUrl" >
+                          <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
+                          <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                         </div>
                       </div>
                     </div>

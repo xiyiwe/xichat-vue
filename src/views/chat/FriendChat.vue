@@ -73,8 +73,8 @@
                           <div class="info-my">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                             <p class="info-content-my">{{messages.messageContent | decryptMessage}}</p>
-                            <a v-if="messages.fileType===''" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
-                            <img v-if="messages.fileType!==''" :src="messages.fileUrl" >
+                            <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
+                            <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
                           </div>
                         </div>
                       </div>
@@ -208,7 +208,8 @@ export default {
         if (idx != -1){
           var ext = imgName.substr(idx+1).toUpperCase();
           ext = ext.toLowerCase( );
-          if (ext!='pdf' && ext!='doc' && ext!='docx' && ext!='png' ){
+          if (ext!='pdf' && ext!='doc' && ext!='docx' && ext!='png' &&ext!='mp4'){
+            this.uploadReturnMessage = "文件格式不规范"
               return false
           }else if(this.uploadFile.name.indexOf("%") !== -1){
             this.uploadReturnMessage = "文件名不能含有%"
@@ -238,7 +239,16 @@ export default {
       // this.sendMessageInfo.fileUrl = "C:\\zyz\\biyesheji\\xichat\\xichat-vue\\xichat-vue\\src\\static\\"+fileName
       // let file =  this.uploadFile
       if (this.uploadFile.type!==""){
-        this.sendMessageInfo.fileUrl = "/static/images/"+fileName
+        let type = this.uploadFile.type
+        let indexType = type.indexOf("/")
+        let subType = type.substring(0,indexType)
+        if (subType==="image") {
+          this.sendMessageInfo.fileUrl = "/static/images/" + fileName
+        }else if(subType==="video"){
+          this.sendMessageInfo.fileUrl = "/static/files/" + fileName
+        }else{
+          this.sendMessageInfo.fileUrl = "/static/files/" + fileName
+        }
       }else{
         this.sendMessageInfo.fileUrl = "/static/files/"+fileName
       }
