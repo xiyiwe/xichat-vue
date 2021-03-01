@@ -1,7 +1,7 @@
 <template>
   <el-container style="height: 700px; border: 1px solid #eee;flex-grow:1" >
     <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-      <el-menu router :default-openeds="['1', '2','3','4']">
+      <el-menu router :default-openeds="['1', '2','3','4','5']">
         <el-submenu index="1">
           <template slot="title">好友菜单</template>
           <el-menu-item index="/addFriend">添加好友</el-menu-item>
@@ -41,6 +41,10 @@
               </el-dropdown>
             </el-menu-item>
           </el-submenu>
+        </el-submenu>
+        <el-submenu index="5">
+          <template slot="title">个人信息</template>
+          <el-menu-item index="/updateUser">修改个人资料</el-menu-item>
         </el-submenu>
       </el-menu>
     </el-aside>
@@ -222,8 +226,8 @@ export default {
   line-height: 60px;
 }
 
-.el-aside {
-  color: #333;
-}
+/*.el-aside {*/
+/*  color: #333;*/
+/*}*/
 </style>
 

@@ -13,7 +13,7 @@
 
 <script>
   export default {
-    name: "AddStudent",
+    name: "AddFriend",
     data() {
       return {
         errMsg:'',

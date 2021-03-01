@@ -5,9 +5,10 @@ import Index from '../views/index/Index'
 import FriendChat from "@/views/chat/FriendChat";
 import GroupChat from "@/views/chat/GroupChat";
 import Register from "@/views/regist/Register";
-import AddStudent from "@/components/friend/AddStudent";
+import AddFriend from "@/components/friend/AddFriend";
 import AddGroup from "@/components/group/AddGroup";
 import JoinGroup from "@/components/group/JoinGroup";
+import UpdateUser from "@/components/User/UpdateUser";
 Vue.use(Router)
 
 export default new Router({
@@ -44,8 +45,13 @@ export default new Router({
         // },
         {
           path: '/addFriend',
-          name: 'AddStudent',
-          component: AddStudent
+          name: 'AddFriend',
+          component: AddFriend
+        },
+        {
+          path: '/updateUser',
+          name: 'UpdateUser',
+          component: UpdateUser
         },
         {
           path: '/addGroup',
