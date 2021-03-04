@@ -405,7 +405,7 @@ export default {
     this.wsObj.onclose=(evt)=>{
       console.log(evt)
     }
-    this.wsObj.close()
+    this.wsObj.close(this.userAccount)
   },
   mounted() {
 

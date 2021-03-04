@@ -10,7 +10,8 @@
 <!--            <el-menu-item index="/friendChat" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">-->
             <el-menu-item index="/friendChat/" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">
               {{item.userName}}
-              <span style="color: red" v-if="item.notReadMessageCount!=='0'">{{ item.notReadMessageCount }}</span>
+              <span style="color: red" v-if="item.notReadMessageCount!=='0'">未读:{{ item.notReadMessageCount }}</span>
+              <span style="color: black" >{{ item.state | onlineState}}</span>
               <el-dropdown>
                  <span class="el-dropdown-link">
                   <i class="el-icon-arrow-down el-icon--right"></i>
@@ -75,6 +76,7 @@
 </template>
 
 <script>
+
 export default {
   name: "Index",
   // groupList:[],
@@ -89,6 +91,15 @@ export default {
       notReadGroupList:[]
   };
 },
+  filters:{
+    onlineState(state){
+        if(state==='1'){
+          return '在线'
+        }else{
+          return '不在线'
+        }
+    }
+  },
   methods:{
     deleteFriend(fUserAccount){
       const _this = this
@@ -164,7 +175,7 @@ export default {
         }
       })
     },
-    //查询所有好友发来的未读消息数量和好友信息
+    //查询所有好友发来的未读消息数量和好友信息和在线状态
     updateFriendListAndNotReadMessage(){
       const _this = this
       _this.axios({
@@ -216,7 +227,14 @@ export default {
     _this.updateFriendListAndNotReadMessage()
     _this.updateGroupListAndNotReadMessage()
 
-  }
+  },
+  beforeDestroy() {
+    // this.onlineStatus='不在线'
+    this.wsObj.onclose=(evt)=>{
+      console.log(evt)
+    }
+    this.wsObj.close(this.userAccount)
+  },
 }
 </script>
 
