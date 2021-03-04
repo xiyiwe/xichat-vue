@@ -124,6 +124,7 @@ export default {
       }
       }).then(function () {
         sessionStorage.setItem("userName", "")
+        sessionStorage.setItem('userAccount',"")
         sessionStorage.setItem("Authorization", "")
         // sessionStorage.setItem("currentUser","")
         _this.$router.push('/login')

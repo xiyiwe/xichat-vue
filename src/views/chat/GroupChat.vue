@@ -27,8 +27,8 @@
                     <div class="info">
                       <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                       <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
-                      <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
-                      <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
+                      <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
+                      <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                     </div>
                   </div>
                   <!-- 我的 -->
@@ -36,8 +36,8 @@
                     <div class="info-my">
                       <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                       <div class="info-content-my">{{messages.messageContent | decryptMessage}}</div>
-                      <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
-                      <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
+                      <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
+                      <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                     </div>
                   </div>
                 </div>
@@ -61,8 +61,8 @@
                         <div class="info">
                           <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                           <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
-                          <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
-                          <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
+                          <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
+                          <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                         </div>
                       </div>
                       <!-- 我的 -->
@@ -70,8 +70,8 @@
                         <div class="info-my">
                           <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                           <p class="info-content-my">{{messages.messageContent | decryptMessage}}</p>
-                          <a v-if="messages.fileType==='file'" v-bind:href="messages.fileUrl">{{messages.fileName}}</a>
-                          <img v-if="messages.fileType==='image'" :src="messages.fileUrl" >
+                          <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
+                          <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                         </div>
                       </div>
                     </div>
@@ -199,13 +199,17 @@ export default {
       for(var i = 0;i<file.length;i++){
         //    上传类型判断
         this.uploadFile=file[0]
-
+        if(file[i].size>=10485760){
+          this.uploadReturnMessage = "文件过大"
+          return false
+        }
         var imgName = file[i].name;
         var idx = imgName.lastIndexOf(".");
         if (idx != -1){
           var ext = imgName.substr(idx+1).toUpperCase();
           ext = ext.toLowerCase( );
-          if (ext!='pdf' && ext!='doc' && ext!='docx' && ext!='png' ){
+          if (ext!='pdf' && ext!='doc' && ext!='docx' && ext!='png' &&ext!='mp4'){
+            this.uploadReturnMessage = "文件格式不规范"
             return false
           }else if(this.uploadFile.name.indexOf("%") !== -1){
             this.uploadReturnMessage = "文件名不能含有%"
@@ -239,6 +243,7 @@ export default {
       }else{
         this.sendMessageInfo.fileUrl = "/static/files/"+fileName
       }
+      this.sendMessageInfo.fileUrl = this.encrypt( this.sendMessageInfo.fileUrl)
       let fileFormData  = new FormData();
       console.log(this.uploadFile)
       fileFormData.append('file', this.uploadFile, fileName);//filename是键，file是值，就是要传的文件，test.zip是要传的文件名
