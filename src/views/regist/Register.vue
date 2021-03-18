@@ -106,7 +106,6 @@ export default {
                   _this.$router.push('/login')
                 }
 
-
                 // if (resp.data.authority === 'student') {
                 //   sessionStorage.setItem('authority', 'student')
                 //   sessionStorage.setItem('currentUser', resp.data.swno)

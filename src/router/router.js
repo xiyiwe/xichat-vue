@@ -9,6 +9,7 @@ import AddFriend from "@/components/friend/AddFriend";
 import AddGroup from "@/components/group/AddGroup";
 import JoinGroup from "@/components/group/JoinGroup";
 import UpdateUser from "@/components/User/UpdateUser";
+import Notify from "@/components/User/Notify";
 Vue.use(Router)
 
 export default new Router({
@@ -49,7 +50,7 @@ export default new Router({
           component: AddFriend
         },
         {
-          path: '/updateUser',
+          path: '/user/updateUser',
           name: 'UpdateUser',
           component: UpdateUser
         },
@@ -67,7 +68,12 @@ export default new Router({
           path: '/groupChat/:groupId',
           name: 'GroupChat',
           component: GroupChat
-        }
+        },
+        {
+          path: '/user/notify',
+          name: 'Notify',
+          component: Notify
+        },
         ]
     }
   ]

@@ -44,8 +44,9 @@
           </el-submenu>
         </el-submenu>
         <el-submenu index="5">
-          <template slot="title">个人信息</template>
-          <el-menu-item index="/updateUser">修改个人资料</el-menu-item>
+          <template slot="title">个人中心</template>
+          <el-menu-item index="/user/updateUser">修改个人资料</el-menu-item>
+          <el-menu-item index="/user/notify">请求通知</el-menu-item>
         </el-submenu>
       </el-menu>
     </el-aside>
