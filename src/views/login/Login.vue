@@ -99,6 +99,7 @@ export default {
               sessionStorage.setItem('token',resp.data.token)
               sessionStorage.setItem('userName',resp.data.userName)
               sessionStorage.setItem('userAccount',resp.data.userAccount)
+              sessionStorage.setItem('userImg',resp.data.userImg)
               _this.$router.push('/index')
             }
 

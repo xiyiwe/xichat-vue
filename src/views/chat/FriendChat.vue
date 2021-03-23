@@ -26,7 +26,7 @@
               <div v-for="(messages,index) in messageList" :key="index" >
                 <!-- 对方 -->
                 <div class="word" v-if="userAccount!==messages.senderAccount">
-<!--                  <img :src="messages.fileUrl">-->
+                  <img :src="messages.userImg">
                   <div class="info">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                     <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
@@ -36,6 +36,7 @@
                 </div>
                 <!-- 我的 -->
                 <div class="word-my" v-else>
+                  <img :src="messages.userImg">
                   <div class="info-my">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                     <div class="info-content-my">{{messages.messageContent | decryptMessage}}</div>
