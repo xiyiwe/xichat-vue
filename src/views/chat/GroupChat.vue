@@ -23,6 +23,7 @@
                 <div v-for="(messages,index) in messageList" :key="index" >
                   <!-- 对方 -->
                   <div class="word" v-if="userAccount!==messages.senderAccount">
+                    <img class="userImg"  :src="allGroupMemberUserImg[messages.senderAccount]">
                     <!--                  <img :src="messages.fileUrl">-->
                     <div class="info">
                       <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
@@ -39,6 +40,7 @@
                       <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
                       <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                     </div>
+                    <img class="userImg"  :src="allGroupMemberUserImg[userAccount]">
                   </div>
                 </div>
               </div>
@@ -57,6 +59,7 @@
                     <div v-for="(messages,index) in historyMessageList" :key="index" >
                       <!-- 对方 -->
                       <div class="word" v-if="userAccount!==messages.senderAccount">
+                        <img class="userImg"  :src="allGroupMemberUserImg[messages.senderAccount]">
                         <!--                          <img v-if="messages.fileUrl!=null && messages.fileUrl!==''" :src="messages.fileUrl" :onerror="imgDemo">-->
                         <div class="info">
                           <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
@@ -73,6 +76,7 @@
                           <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
                           <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                         </div>
+                        <img class="userImg"  :src="allGroupMemberUserImg[userAccount]">
                       </div>
                     </div>
                     <el-pagination
@@ -137,6 +141,7 @@ export default {
     return {
       // imgDemo:require('C:\\zyz\\biyesheji\\xichat\\xichat-vue\\xichat-vue\\src\\static\\logo.png'),
       // actionUrl:'D:\\itemRepository\\gitRepository\\xichat-vue\\src\\files\\',
+      allGroupMemberUserImg:'',
       fileList:[],
       historyMessageCount:0,
       historyCurrentPage:1,
@@ -260,39 +265,6 @@ export default {
         _this.sendMessageBySocket()
       })
     },
-    // beforeUploadFile(file){
-    //   // console.log('before upload')
-    //   var testmsg = file.name.substring(file.name.lastIndexOf('.')+1)
-    //   var size = file.size / 1024 / 1024
-    //   // var type=".png.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf"
-    //   var extension  = testmsg === 'png'
-    //   var extension1 = testmsg === 'jpg'
-    //   var extension2 = testmsg === 'jpeg'
-    //   var extension3 = testmsg === 'doc'
-    //   var extension4 = testmsg === 'docx'
-    //   var extension5 = testmsg === 'xls'
-    //   var extension6 = testmsg === 'xlsx'
-    //   var extension7 = testmsg === 'ppt'
-    //   var extension8 = testmsg === 'pdf'
-    //
-    //   if(!extension && !extension1&& !extension2&& !extension3&& !extension4&& !extension5&& !extension6&& !extension7&& !extension8) {
-    //     this.$message.warning({
-    //       title: '警告',
-    //       message: "只能上传.png.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf的文件"
-    //     });
-    //     return false;
-    //   }else {
-    //     if(size > 2) {
-    //       this.$message.warning({
-    //         title: '警告',
-    //         message: "文件大小不得超过2M"
-    //       });
-    //       return false;
-    //     }
-    //   }
-    //
-    //   return (extension || extension1|| extension2|| extension3|| extension4|| extension5|| extension6|| extension7|| extension8) && size
-    // },
 
     // eslint-disable-next-line no-unused-vars
     handleRemoveFile(file, fileList) {
@@ -398,6 +370,18 @@ export default {
       }).then(function (rsp) {
         _this.historyMessageCount = rsp.data
       })
+    },
+    getAllGroupMemberUserImg(){
+      const _this = this
+      this.axios({
+        url: '/group/getAllGroupMemberUserImg/'+this.groupId,
+        method: 'get',
+        headers: {
+          Authorization: sessionStorage.token
+        }
+      }).then(function (rsp) {
+        _this.allGroupMemberUserImg = rsp.data
+      })
     }
   },
   beforeDestroy() {
@@ -416,6 +400,7 @@ export default {
     this.wsUri = 'ws://localhost:8100/chat/'+this.userAccount
     this.wsObj = new WebSocket(this.wsUri)
     this.createWebSocket()
+    this.getAllGroupMemberUserImg()
     // this.getNotReadMessage(this.groupId)
     this.getHistoryMessageByPage(1)
     this.$emit("updateGroupListAndNotReadMessage")
@@ -501,11 +486,11 @@ export default {
   justify-content:flex-end;
   margin-bottom: 20px;
 }
-/*img{*/
-/*  width: 40px;*/
-/*  height: 40px;*/
-/*  border-radius: 50%;*/
-/*}*/
+.userImg{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
 .info{
   margin-left: 10px;}
 .time{
@@ -523,11 +508,11 @@ export default {
   margin-bottom: 20px;
   text-align: right;
 }
-/*img{*/
-/*  width: 40px;*/
-/*  height: 40px;*/
-/*  border-radius: 50%;*/
-/*}*/
+.userImg{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
 .info{
   width: 90%;
   margin-right: 10px;

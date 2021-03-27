@@ -75,6 +75,7 @@ import cryptoAES from '../../utils/js/cryptoAES'
                       callback: action => {
                         sessionStorage.setItem('userName',_this.ruleForm.userName)
                         sessionStorage.setItem('userAccount',_this.ruleForm.userAccount)
+                        sessionStorage.setItem('userImg',_this.ruleForm.userImg)
                         _this.$router.push('/user/updateUser')
                         window.location.reload()
                       }

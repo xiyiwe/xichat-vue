@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: 700px; border: 1px solid #eee;flex-grow:1" >
-    <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+    <el-aside width="250px" style="background-color: rgb(238, 241, 246)">
       <el-menu router :default-openeds="['1', '2','3','4','5']">
         <el-submenu index="1">
           <template slot="title">好友菜单</template>
@@ -8,8 +8,10 @@
           <el-submenu index="2">
             <template slot="title">好友列表</template>
 <!--            <el-menu-item index="/friendChat" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">-->
-            <el-menu-item index="/friendChat/" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName)">
-              {{item.userName}}
+            <el-menu-item index="/friendChat/" v-for="(item) in friendsList"  :key="item.userName" @click="pushFriendInfo(item.userAccount,item.userName,item.userImg)">
+
+              <img style="float: left" class="userImg" :src="item.userImg">
+              <span>{{item.userName}}</span>
               <span style="color: red" v-if="item.notReadMessageCount!=='0'">未读:{{ item.notReadMessageCount }}</span>
               <span style="color: black" >{{ item.state | onlineState}}</span>
               <el-dropdown>
@@ -61,7 +63,9 @@
             <el-dropdown-item @click.native="logout()">退出</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
+        <img class="userImg" :src="userImg">
         <span>用户：{{user}}</span>
+
       </el-header>
 
       <el-main>
@@ -84,6 +88,7 @@ export default {
   data() {
     return {
       user:'',
+      userImg:'',
       currentFUserAccount:'',
       groupList:[],
       friendsList:[],
@@ -102,6 +107,18 @@ export default {
     }
   },
   methods:{
+    // getFUserImgs(userAccount){
+    //   const _this = this
+    //   this.axios({
+    //     url: '/friend/getFUserImgs/'+userAccount,
+    //     method: 'get',
+    //     headers: {
+    //       Authorization: sessionStorage.token
+    //     }
+    //   }).then(function (resp){
+    //     _this.groupList = resp.data
+    //   })
+    // },
     deleteFriend(fUserAccount){
       const _this = this
       this.axios({
@@ -153,13 +170,14 @@ export default {
           })
     },
     //点击左侧好友
-    pushFriendInfo(fUserAccount,fUserName){
+    pushFriendInfo(fUserAccount,fUserName,fUserImg){
         this.$router.push(
             {
               path:'/friendChat/'+fUserAccount,
               query:{
                 currentFUserName:fUserName,
-                currentFUserAccount:fUserAccount
+                currentFUserAccount:fUserAccount,
+                currentFUserImg:fUserImg
               }
             }
         )
@@ -225,6 +243,7 @@ export default {
     }
     const _this = this
     _this.user = sessionStorage.getItem("userName")
+    _this.userImg = sessionStorage.getItem("userImg")
     _this.updateFriendListAndNotReadMessage()
     _this.updateGroupListAndNotReadMessage()
 
@@ -245,7 +264,11 @@ export default {
   color: #333;
   line-height: 60px;
 }
-
+.userImg{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
 /*.el-aside {*/
 /*  color: #333;*/
 /*}*/

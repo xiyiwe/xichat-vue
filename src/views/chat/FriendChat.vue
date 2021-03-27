@@ -26,7 +26,7 @@
               <div v-for="(messages,index) in messageList" :key="index" >
                 <!-- 对方 -->
                 <div class="word" v-if="userAccount!==messages.senderAccount">
-                  <img :src="messages.userImg">
+                    <img class="userImg"  :src="fUserImg">
                   <div class="info">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                     <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
@@ -36,13 +36,13 @@
                 </div>
                 <!-- 我的 -->
                 <div class="word-my" v-else>
-                  <img :src="messages.userImg">
                   <div class="info-my">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
                     <div class="info-content-my">{{messages.messageContent | decryptMessage}}</div>
                     <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
                     <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                   </div>
+                    <img class="userImg" :src="userImg">
                 </div>
               </div>
             </div>
@@ -61,6 +61,7 @@
                       <div v-for="(messages,index) in historyMessageList" :key="index" >
                         <!-- 对方 -->
                         <div class="word" v-if="userAccount!==messages.senderAccount">
+                            <img class="userImg"  :src="fUserImg">
 <!--                          <img v-if="messages.fileUrl!=null && messages.fileUrl!==''" :src="messages.fileUrl" :onerror="imgDemo">-->
                           <div class="info">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
@@ -77,6 +78,7 @@
                             <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
                             <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                           </div>
+                            <img class="userImg"  :src="userImg">
                         </div>
                       </div>
                       <el-pagination
@@ -150,6 +152,7 @@ export default {
       messageList:[],
       fUserAccount:'',
       fUserName:'',
+      fUserImg:'',
       sendMessage:'',
       sendMessageInfo:{
         sendMessage:'',
@@ -172,6 +175,7 @@ export default {
       errorMessage:'',
       userAccount: '',
       userName:'',
+        userImg:'',
       wsUri :'' ,
       wsObj: ''
     }
@@ -419,17 +423,15 @@ export default {
     this.wsObj.close(this.userAccount)
   },
   mounted() {
-    // if(sessionStorage.getItem("token")===null){
-    //   this.$router.push(
-    //       {
-    //         path:'/',
-    //       }
-    //   )
-    // }
-    this.userAccount = sessionStorage.getItem("userAccount")
-    this.userName = sessionStorage.getItem("userName")
-    this.fUserAccount = this.$route.query.currentFUserAccount
-    this.fUserName = this.$route.query.currentFUserName
+      this.fUserImg = this.$route.query.currentFUserImg
+      this.userAccount = sessionStorage.getItem("userAccount")
+      this.userName = sessionStorage.getItem("userName")
+      this.userImg = sessionStorage.getItem("userImg")
+      this.fUserImg = this.$route.query.currentFUserImg
+      this.fUserAccount = this.$route.query.currentFUserAccount
+     this.fUserName = this.$route.query.currentFUserName
+
+
     this.wsUri = 'ws://localhost:8100/chat/'+this.userAccount
     this.wsObj = new WebSocket(this.wsUri)
     this.createWebSocket()
@@ -540,11 +542,11 @@ export default {
   margin-bottom: 20px;
   text-align: right;
 }
-/*img{*/
-/*  width: 40px;*/
-/*  height: 40px;*/
-/*  border-radius: 50%;*/
-/*}*/
+.userImg{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
 .info{
   width: 90%;
   margin-right: 10px;
