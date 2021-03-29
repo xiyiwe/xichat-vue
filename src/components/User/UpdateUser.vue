@@ -56,18 +56,18 @@ import cryptoAES from '../../utils/js/cryptoAES'
               console.log(this.ruleForm.userImg)
               console.log(this.uploadFile)
                 this.axios({
-                  url: '/user/updateuser',
-                  method:'post',
-                  data: {
-                    'userAccount' :this.ruleForm.userAccount,
-                    'userName':this.ruleForm.userName,
-                    'password':cryptoAES.encrypt(this.ruleForm.password),
-                    'userImg': this.ruleForm.userImg
-                  },
-                  headers: {
-                    Authorization: sessionStorage.token
-                  }
-                }).then(function (resp) {
+                url: '/user/updateuser',
+                method:'post',
+                data: {
+                  'userAccount' :this.ruleForm.userAccount,
+                  'userName':this.ruleForm.userName,
+                  'password':cryptoAES.encrypt(this.ruleForm.password),
+                  'userImg': this.ruleForm.userImg
+                },
+                headers: {
+                  Authorization: sessionStorage.token
+                }
+              }).then(function (resp) {
                   if (resp.data === 'ok') {
                     _this.$alert(_this.ruleForm.userAccount + ' 修改成功！', '消息', {
                       confirmButtonText: '确定',

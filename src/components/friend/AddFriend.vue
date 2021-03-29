@@ -35,7 +35,7 @@
             this.ruleForm.userAccount =this.ruleForm.userAccount.replace(/(\s*$)/g,"")
                 this.axios({
                   url: '/friend/addfriend/'+this.ruleForm.userAccount,
-                  method:'post',
+                  method:'get',
                   // data: {
                   //   'userAccount' :this.ruleForm.userAccount
                   // },
