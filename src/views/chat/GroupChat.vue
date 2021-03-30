@@ -385,14 +385,18 @@ export default {
     }
   },
   beforeDestroy() {
-    // this.onlineStatus='不在线'
-    this.wsObj.onclose=(evt)=>{
-      console.log(evt)
-    }
-    this.wsObj.close(this.userAccount)
+    // // this.onlineStatus='不在线'
+    // try{
+    //   // this.wsObj.onclose=(evt)=>{
+    //   //   console.log(evt)
+    //   // }
+    //   this.wsObj.close(this.userAccount)
+    // }catch (e) {
+    //   console.log(e)
+    //   console.log("GBeforeD出错")
+    // }
   },
   mounted() {
-
     this.userAccount = sessionStorage.getItem("userAccount")
     this.userName = sessionStorage.getItem("userName")
     this.groupId = this.$route.query.currentGroupId
@@ -423,14 +427,17 @@ export default {
             }
           }).then(function (rsp) {
             _vm.messageList = rsp.data
+            _vm.axios({
+              url:'/group/updateGroupNotReadMessage/'+_vm.$route.query.currentGroupId,
+              method: 'get',
+              headers: {
+                Authorization: sessionStorage.token
+              }
+            }).then(function (){
+              _vm.$emit("updateGroupListAndNotReadMessage")
+            })
           })
-          _vm.axios({
-            url:'/group/updateGroupNotReadMessage/'+_vm.$route.query.currentGroupId,
-            method: 'get',
-            headers: {
-              Authorization: sessionStorage.token
-            }
-          })
+
         })
   },
   // 在当前路由改变，但是该组件被复用时调用

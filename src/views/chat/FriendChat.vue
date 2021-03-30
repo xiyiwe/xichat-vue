@@ -334,11 +334,14 @@ export default {
           _this.messageList.push(JSON.parse(evt.data))
           _this.$emit("updateNotReadMessage",JSON.parse(evt.data).senderAccount)
         }
+
       }
       // console.log("执行错误")
       // this.wsObj.onerror =function (evt){this.onWsError(evt)}
       // console.log("执行关闭")
-      // this.wsObj.onclose = function (evt){this.onWsClose(evt)}
+      this.wsObj.onclose = function (){
+        console.log("执行了关闭")
+      }
     },
     sendMessageBySocket () {
       console.log("send message")
@@ -416,11 +419,16 @@ export default {
     }
   },
   beforeDestroy() {
-    // this.onlineStatus='不在线'
-    this.wsObj.onclose=(evt)=>{
-      console.log(evt)
-    }
-    this.wsObj.close(this.userAccount)
+    // // this.onlineStatus='不在线'‘
+    // try{
+    //   // this.wsObj.onclose=(evt)=>{
+    //   //   console.log(evt)
+    //   // }
+    //   this.wsObj.close(this.userAccount)
+    // }catch (e) {
+    //   console.log(e)
+    //   console.log("FBeforeD出错")
+    // }
   },
   mounted() {
       this.fUserImg = this.$route.query.currentFUserImg

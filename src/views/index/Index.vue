@@ -209,6 +209,7 @@ export default {
     },
     //查询所有群组发来的未读消息数量和群组信息
     updateGroupListAndNotReadMessage(){
+      console.log("调用了：updateGroupListAndNotReadMessage")
       const _this = this
       this.axios({
         url:'/group/getUserGroupsAndNotReadMessageCount',
