@@ -90,6 +90,23 @@
                 </el-scrollbar>
               </el-drawer>
             </div>
+<!--            查看所有人员-->
+            <div>
+              <el-drawer
+                  title="群内所有人员"
+                  :visible.sync="groupMembersDrawer"
+                  :direction="direction">
+
+                <el-scrollbar style="height:70%">
+                  <div v-for="(groupMember,index) in groupMembers" :key="index" >
+                    <p>
+                      <img class="userImg"  :src="groupMember.userImg">
+                      账号:{{groupMember.userAccount}},用户名:{{groupMember.userName}},状态:{{groupMember.state | onlineState}}</p>
+                  </div>
+
+                </el-scrollbar>
+              </el-drawer>
+            </div>
           </el-main>
           <el-footer>
             <div>
@@ -98,24 +115,11 @@
               <el-button @click="messageHistoryDrawer = true;getHistoryMessageByPage(1)" type="primary" style="margin-top: 10px;float: right" >
                 历史记录
               </el-button>
+              <el-button @click="groupMembersDrawer = true;getGroupMembers()" type="primary" style="margin-top: 10px;float: right" >
+                查看群内人员
+              </el-button>
             </div>
             <div>
-              <!--              <el-upload-->
-              <!--                  class="upload-demo"-->
-              <!--                  ref="upload"-->
-              <!--                  action="#"-->
-              <!--                  :http-request="uploadMethod"-->
-              <!--                  accept=".png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf"-->
-              <!--                  :limit="limitFile"-->
-              <!--                  :on-change="picFile"-->
-              <!--                  :auto-upload="false"-->
-              <!--                  :file-list="fileList">-->
-              <!--                <el-button  type="primary" style="margin-top: 10px;float: left" >-->
-              <!--                  点击上传-->
-              <!--                </el-button>-->
-              <!--&lt;!&ndash;                <div slot="tip" class="el-upload__tip">支持文件格式有png,jpg,jpeg,doc,docx,xls,xlsx,ppt,pdf,文件大小不超过2M</div>&ndash;&gt;-->
-              <!--              </el-upload>-->
-              <!--              <el-form @change="uploadMethod" id="domeform"  method="post" enctype="multipart/form-data">-->
               <input type="file"  value="选择文件" @change="getFile($event)">
               <!--                <input type="submit" value="表单提交">-->
               <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传</el-button>
@@ -141,10 +145,12 @@ export default {
     return {
       // imgDemo:require('C:\\zyz\\biyesheji\\xichat\\xichat-vue\\xichat-vue\\src\\static\\logo.png'),
       // actionUrl:'D:\\itemRepository\\gitRepository\\xichat-vue\\src\\files\\',
+      groupMembers:[],
       allGroupMemberUserImg:'',
       fileList:[],
       historyMessageCount:0,
       historyCurrentPage:1,
+      groupMembersDrawer:false,
       messageHistoryDrawer:false,
       direction: 'rtl',
       historyMessageList:[],
@@ -178,6 +184,13 @@ export default {
     }
   },
   filters:{
+    onlineState(state){
+      if(state==='1'){
+        return '在线'
+      }else{
+        return '不在线'
+      }
+    },
     formatDate(time) {
       let date = new Date(time);
       return formatDate(date, 'yyyy年MM月dd日 hh:mm:ss');
@@ -381,6 +394,20 @@ export default {
         }
       }).then(function (rsp) {
         _this.allGroupMemberUserImg = rsp.data
+      })
+    },
+    /*查看群内所有人员*/
+    getGroupMembers(){
+      const _this = this
+      this.axios({
+        url: '/group/getGroupMemberInfo/'+this.groupId,
+        method: 'get',
+        headers: {
+          Authorization: sessionStorage.token
+        }
+      }).then(function (rsp) {
+        _this.groupMembers = rsp.data
+        console.log(_this.groupMembers)
       })
     }
   },
