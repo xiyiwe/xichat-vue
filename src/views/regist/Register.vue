@@ -12,7 +12,7 @@
         <el-input type="text" name="userName" v-model="form.userName"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" v-on:click="doRegister()">注册</el-button>
+        <el-button type="primary" v-on:click="doRegister('loginForm')">注册</el-button>
       </el-form-item>
       <span >{{ errorMessage }}</span>
     </el-form>
@@ -49,7 +49,9 @@ export default {
           {required: true, message: '账号不可为空', trigger: 'blur'}
         ],
         password: [
-          {required: true, message: '密码不可为空', trigger: 'blur'}
+          {required: true, message: '密码不可为空', trigger: 'blur'},
+          { pattern: '^[\\w\\W]{6,}$' ,
+            message: '密码需大于等于6位' }
         ],
         userName: [
           {required: true, message: '用户名不可为空', trigger: 'blur'}
@@ -77,10 +79,12 @@ export default {
       // let decrypt = CryptoJS.AES.decrypt(word, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7})
       return cryptoAES.decrypt(word)
     },
-    doRegister () {
+    doRegister (formName) {
       const _this = this
       _this.errorMessage = ''
       // 为表单绑定验证功能
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
           this.axios(
               {
                 url: '/register',
@@ -111,6 +115,8 @@ export default {
                 //   sessionStorage.setItem('currentUser', resp.data.swno)
                 //   _this.$router.push('/studentMain')
                 // }
+              })
+        }
               })
         }
       // 使用 vue-router 路由到指定页面，该方式称之为编程式导航

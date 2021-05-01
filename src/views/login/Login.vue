@@ -13,7 +13,7 @@
         <el-button type="primary" v-on:click="onSubmit('loginForm')">登录</el-button>
         <el-button type="primary" v-on:click="onRegister()">注册</el-button>
       </el-form-item>
-      <span >{{ errorMessage }}</span>
+      <span style="color:red;" >{{ errorMessage }}</span>
     </el-form>
 
   </div>

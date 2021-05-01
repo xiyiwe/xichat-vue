@@ -250,10 +250,10 @@ export default {
 
   },
   beforeDestroy() {
-    // this.onlineStatus='不在线'
-    this.wsObj.onclose=(evt)=>{
-      console.log(evt)
-    }
+    // // this.onlineStatus='不在线'
+    // this.wsObj.onclose=(evt)=>{
+    //   console.log(evt)
+    // }
     this.wsObj.close(this.userAccount)
   },
 }

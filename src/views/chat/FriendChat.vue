@@ -277,39 +277,7 @@ export default {
           _this.sendMessageBySocket()
         })
     },
-    // beforeUploadFile(file){
-    //   // console.log('before upload')
-    //   var testmsg = file.name.substring(file.name.lastIndexOf('.')+1)
-    //   var size = file.size / 1024 / 1024
-    //   // var type=".png.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf"
-    //   var extension  = testmsg === 'png'
-    //   var extension1 = testmsg === 'jpg'
-    //   var extension2 = testmsg === 'jpeg'
-    //   var extension3 = testmsg === 'doc'
-    //   var extension4 = testmsg === 'docx'
-    //   var extension5 = testmsg === 'xls'
-    //   var extension6 = testmsg === 'xlsx'
-    //   var extension7 = testmsg === 'ppt'
-    //   var extension8 = testmsg === 'pdf'
-    //
-    //   if(!extension && !extension1&& !extension2&& !extension3&& !extension4&& !extension5&& !extension6&& !extension7&& !extension8) {
-    //     this.$message.warning({
-    //       title: '警告',
-    //       message: "只能上传.png.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pdf的文件"
-    //     });
-    //     return false;
-    //   }else {
-    //     if(size > 2) {
-    //       this.$message.warning({
-    //         title: '警告',
-    //         message: "文件大小不得超过2M"
-    //       });
-    //       return false;
-    //     }
-    //   }
-    //
-    //   return (extension || extension1|| extension2|| extension3|| extension4|| extension5|| extension6|| extension7|| extension8) && size
-    // },
+
 
     // eslint-disable-next-line no-unused-vars
     handleRemoveFile(file, fileList) {
@@ -321,11 +289,11 @@ export default {
     initWsEventHandle(){
       const _this = this
       // eslint-disable-next-line no-unused-vars
-      this.wsObj.onopen=function (event) {
+        _this.wsObj.onopen=function (event) {
         console.log("WebSocket is open now.");
       }
       // this.onlineStatus='在线'
-      this.wsObj.onmessage = function (evt){
+        _this.wsObj.onmessage = function (evt){
         if ((JSON.parse(evt.data).senderAccount!==_this.fUserAccount&&JSON.parse(evt.data).senderAccount !== _this.userAccount )||JSON.parse(evt.data).isGroup==='1' ){
           console.log("当前不是这个好友")
           _this.messageRemind(JSON.parse(evt.data));
