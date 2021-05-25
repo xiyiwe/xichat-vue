@@ -7,10 +7,10 @@
         <el-input type="text" name="userAccount"  v-model="form.userAccount"/>
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input type="password" name="password" v-model="form.password"/>
+        <el-input type="password"  name="password" v-model="form.password"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" v-on:click="onSubmit('loginForm')">登录</el-button>
+        <el-button type="primary"  v-on:click="onSubmit('loginForm')">登录</el-button>
         <el-button type="primary" v-on:click="onRegister()">注册</el-button>
       </el-form-item>
       <span style="color:red;" >{{ errorMessage }}</span>
@@ -25,7 +25,7 @@ import cryptoAES from '../../utils/js/cryptoAES'
 
 export default {
   name: 'Login',
-  data () {
+  data() {
     return {
       // SURL:'localhost:8100',
       result: '',
@@ -34,9 +34,9 @@ export default {
       // var CRYPTOJSKEY= "ig5hqwkWRPA4+a9A/ORR3vAtYRHLlHVa";
       // CRYPTOJSKEY: 'ig5hqwkWRPA4+a9A/ORR3vAtYRHLlHVa',
       loginInfo: {
-          userAccount: this.encrypt(this.userAccount), // 用户名
-          password: this.encrypt(this.password) // 密码
-        },
+        userAccount: this.encrypt(this.userAccount), // 用户名
+        password: this.encrypt(this.password) // 密码
+      },
       errorMessage: '',
       form: {
         userAccount: '',
@@ -58,63 +58,73 @@ export default {
     }
   },
   methods: {
-    onRegister(){
+    onRegister() {
 
       this.$router.push('/register')
     },
     // 加密
-    encrypt (word) {
+    encrypt(word) {
       return cryptoAES.encrypt(word)
     },
     // 解密
-    decrypt (word) {
+    decrypt(word) {
       return cryptoAES.decrypt(word)
     },
-    onSubmit (formName) {
+    onSubmit(formName) {
       const _this = this
       _this.errorMessage = ''
       // 为表单绑定验证功能
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.axios(
-            {
-              url: '/login',
-              method: 'post',
-              data: {
-                // loginInfo: this.loginInfo
-                'userAccount': this.encrypt(_this.form.userAccount), // 用户名
-                'password': this.encrypt(_this.form.password) // 密码
-                // loginInfo: {
-                //   'userAccount': this.encrypt(_this.form.userAccount), // 用户名
-                //   'password': this.encrypt(_this.form.password) // 密码
-                // },
-              }
-            })
-          // this.axios.post('/login',this.loginInfo)
-          .then(function (resp) {
-            console.log(resp)
-            if(resp.data.msg!=='ok'){
-              _this.errorMessage=resp.data.msg
-            } else{
-              sessionStorage.setItem('token',resp.data.token)
-              sessionStorage.setItem('userName',resp.data.userName)
-              sessionStorage.setItem('userAccount',resp.data.userAccount)
-              sessionStorage.setItem('userImg',resp.data.userImg)
-              _this.$router.push('/index')
-            }
+              {
+                url: '/login',
+                method: 'post',
+                data: {
+                  // loginInfo: this.loginInfo
+                  'userAccount': this.encrypt(_this.form.userAccount), // 用户名
+                  'password': this.encrypt(_this.form.password) // 密码
+                  // loginInfo: {
+                  //   'userAccount': this.encrypt(_this.form.userAccount), // 用户名
+                  //   'password': this.encrypt(_this.form.password) // 密码
+                  // },
+                }
+              })
+              // this.axios.post('/login',this.loginInfo)
+              .then(function (resp) {
+                console.log(resp)
+                if (resp.data.msg !== 'ok') {
+                  _this.errorMessage = resp.data.msg
+                } else {
+                  sessionStorage.setItem('token', resp.data.token)
+                  sessionStorage.setItem('userName', resp.data.userName)
+                  sessionStorage.setItem('userAccount', resp.data.userAccount)
+                  sessionStorage.setItem('userImg', resp.data.userImg)
+                  _this.$router.push('/index')
+                }
 
-            // if (resp.data.authority === 'student') {
-            //   sessionStorage.setItem('authority', 'student')
-            //   sessionStorage.setItem('currentUser', resp.data.swno)
-            //   _this.$router.push('/studentMain')
-            // }
-          })
+                // if (resp.data.authority === 'student') {
+                //   sessionStorage.setItem('authority', 'student')
+                //   sessionStorage.setItem('currentUser', resp.data.swno)
+                //   _this.$router.push('/studentMain')
+                // }
+              })
         }
       })
       // 使用 vue-router 路由到指定页面，该方式称之为编程式导航
       // this.$router.push("/adminMain");
     }
-  }
+  },
+  created() {
+    var _this = this;
+    document.onkeydown = function () {
+      let key = window.event.keyCode;
+      if (key == 13) {
+        _this.onSubmit('loginForm');
+      }
+    };
+
+  },
 }
 </script>
 

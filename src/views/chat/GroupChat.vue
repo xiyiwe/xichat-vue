@@ -27,18 +27,18 @@
                     <!--                  <img :src="messages.fileUrl">-->
                     <div class="info">
                       <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                      <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
+                      <p v-if="messages.messageContent!=='ZOUc5BHlTVGd1Z/jc4HU9Q=='" class="info-content">{{messages.messageContent | decryptMessage}}</p>
                       <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
-                      <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
+                      <img class="fileImg" v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                     </div>
                   </div>
                   <!-- 我的 -->
                   <div class="word-my" v-else>
                     <div class="info-my">
                       <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                      <div class="info-content-my">{{messages.messageContent | decryptMessage}}</div>
+                      <div v-if="messages.messageContent!=='ZOUc5BHlTVGd1Z/jc4HU9Q=='" class="info-content-my">{{messages.messageContent | decryptMessage}}</div>
                       <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
-                      <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
+                      <img class="fileImg" v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                     </div>
                     <img class="userImg"  :src="allGroupMemberUserImg[userAccount]">
                   </div>
@@ -59,22 +59,22 @@
                     <div v-for="(messages,index) in historyMessageList" :key="index" >
                       <!-- 对方 -->
                       <div class="word" v-if="userAccount!==messages.senderAccount">
-                        <img class="userImg"  :src="allGroupMemberUserImg[messages.senderAccount]">
+                        <img class="userImg"  :src="allGroupMemberUserImg[messages.senderAccount]" alt="未上传头像">
                         <!--                          <img v-if="messages.fileUrl!=null && messages.fileUrl!==''" :src="messages.fileUrl" :onerror="imgDemo">-->
                         <div class="info">
                           <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                          <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
+                          <p v-if="messages.messageContent!=='ZOUc5BHlTVGd1Z/jc4HU9Q=='" class="info-content">{{messages.messageContent | decryptMessage}}</p>
                           <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
-                          <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
+                          <img class="fileImg" v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                         </div>
                       </div>
                       <!-- 我的 -->
                       <div class="word-my" v-else>
                         <div class="info-my">
                           <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                          <p class="info-content-my">{{messages.messageContent | decryptMessage}}</p>
+                          <p v-if="messages.messageContent!=='ZOUc5BHlTVGd1Z/jc4HU9Q=='" class="info-content-my">{{messages.messageContent | decryptMessage}}</p>
                           <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
-                          <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
+                          <img class="fileImg" v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                         </div>
                         <img class="userImg"  :src="allGroupMemberUserImg[userAccount]">
                       </div>
@@ -100,7 +100,7 @@
                 <el-scrollbar style="height:70%">
                   <div v-for="(groupMember,index) in groupMembers" :key="index" >
                     <p>
-                      <img class="userImg"  :src="groupMember.userImg">
+                      <img alt="未上传头像" class="userImg"  :src="groupMember.userImg">
                       账号:{{groupMember.userAccount}},用户名:{{groupMember.userName}},状态:{{groupMember.state | onlineState}}</p>
                   </div>
 
@@ -541,6 +541,10 @@ export default {
   justify-content:flex-end;
   margin-bottom: 20px;
   text-align: right;
+}
+.fileImg{
+  width: 30%;
+  height: auto;
 }
 .userImg{
   width: 40px;

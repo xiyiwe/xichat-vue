@@ -29,18 +29,18 @@
                     <img class="userImg"  :src="fUserImg">
                   <div class="info">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                    <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
+                    <p v-if="messages.messageContent!=='ZOUc5BHlTVGd1Z/jc4HU9Q=='" class="info-content">{{messages.messageContent | decryptMessage}}</p>
                     <a v-if="messages.fileType==='file'"  target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
-                    <img v-if="messages.fileType==='image'" v-bind:src="messages.fileUrl | decryptMessage" >
+                    <img class="fileImg" v-if="messages.fileType==='image'" v-bind:src="messages.fileUrl | decryptMessage" >
                   </div>
                 </div>
                 <!-- 我的 -->
                 <div class="word-my" v-else>
                   <div class="info-my">
                     <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                    <div class="info-content-my">{{messages.messageContent | decryptMessage}}</div>
+                    <div v-if="messages.messageContent!=='ZOUc5BHlTVGd1Z/jc4HU9Q=='" class="info-content-my">{{messages.messageContent | decryptMessage}}</div>
                     <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
-                    <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
+                    <img class="fileImg" v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                   </div>
                     <img class="userImg" :src="userImg">
                 </div>
@@ -65,18 +65,18 @@
 <!--                          <img v-if="messages.fileUrl!=null && messages.fileUrl!==''" :src="messages.fileUrl" :onerror="imgDemo">-->
                           <div class="info">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                            <p class="info-content">{{messages.messageContent | decryptMessage}}</p>
+                            <p v-if="messages.messageContent!=='ZOUc5BHlTVGd1Z/jc4HU9Q=='" class="info-content">{{messages.messageContent | decryptMessage}}</p>
                             <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
-                            <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
+                            <img class="fileImg" v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                           </div>
                         </div>
                         <!-- 我的 -->
                         <div class="word-my" v-else>
                           <div class="info-my">
                             <p class="time">{{messages.senderName}}  {{ messages.createTime | formatDate }}</p>
-                            <p class="info-content-my">{{messages.messageContent | decryptMessage}}</p>
+                            <p v-if="messages.messageContent!=='ZOUc5BHlTVGd1Z/jc4HU9Q=='" class="info-content-my">{{messages.messageContent | decryptMessage}}</p>
                             <a v-if="messages.fileType==='file'" target="_blank" v-bind:href="messages.fileUrl | decryptMessage">{{messages.fileName}}</a>
-                            <img v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
+                            <img class="fileImg" v-if="messages.fileType==='image'" :src="messages.fileUrl | decryptMessage" >
                           </div>
                             <img class="userImg"  :src="userImg">
                         </div>
@@ -307,9 +307,9 @@ export default {
       // console.log("执行错误")
       // this.wsObj.onerror =function (evt){this.onWsError(evt)}
       // console.log("执行关闭")
-      this.wsObj.onclose = function (){
-        console.log("执行了关闭")
-      }
+      // this.wsObj.onclose = function (){
+      //   console.log("执行了关闭")
+      // }
     },
     sendMessageBySocket () {
       console.log("send message")
@@ -496,11 +496,10 @@ export default {
   justify-content:flex-end;
   margin-bottom: 20px;
 }
-/*img{*/
-/*  width: 40px;*/
-/*  height: 40px;*/
-/*  border-radius: 50%;*/
-/*}*/
+.fileImg{
+  width: 30%;
+  height: auto;
+}
 .info{
   margin-left: 10px;}
 .time{

@@ -3,18 +3,18 @@
     <el-form ref="loginForm" :model="form" :rules="rules" label-width="80px" class="login-box">
       <h3 class="login-title">注册</h3>
       <el-form-item label="账号" prop="userAccount">
-        <el-input type="text" name="userAccount"  v-model="form.userAccount"/>
+        <el-input type="text" maxlength="10" name="userAccount"  v-model="form.userAccount"/>
       </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input type="password" name="password" v-model="form.password"/>
       </el-form-item>
-      <el-form-item label="用户名" prop="userName">
-        <el-input type="text" name="userName" v-model="form.userName"/>
+      <el-form-item label="昵称" prop="userName">
+        <el-input type="text" maxlength="10" name="userName" v-model="form.userName"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" v-on:click="doRegister('loginForm')">注册</el-button>
       </el-form-item>
-      <span >{{ errorMessage }}</span>
+      <span class="errorMessage">{{ errorMessage }}</span>
     </el-form>
 
   </div>
@@ -142,5 +142,12 @@ export default {
   text-align: center;
   margin: 0 auto 40px auto;
   color: #303133;
+}
+.errorMessage{
+  position:relative;
+  text-align:center;
+  display:block;
+  left:100px;
+  color: red;
 }
 </style>
