@@ -1,14 +1,14 @@
 <template>
   <el-form style="width: 60%; text-align:center" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
 
-    <el-form-item label="用户账号" prop="userAccount">
+    <el-form-item label="用户账号" maxlength="10" prop="userAccount">
       <el-input disabled="disabled" v-model="ruleForm.userAccount"></el-input>
     </el-form-item>
-    <el-form-item label="用户名" prop="userName">
-      <el-input v-model="ruleForm.userName"></el-input>
+    <el-form-item label="用户名"  prop="userName">
+      <el-input maxlength="20" v-model="ruleForm.userName"></el-input>
     </el-form-item>
-    <el-form-item label="密码" prop="password">
-      <el-input type="password" v-model="ruleForm.password"></el-input>
+    <el-form-item label="密码"  prop="password">
+      <el-input type="password" maxlength="20" v-model="ruleForm.password"></el-input>
     </el-form-item>
     <el-form-item label="头像" prop="userImg">
       <input type="file"  value="选择文件"  @change="getFile($event)"/>
@@ -43,8 +43,10 @@ import cryptoAES from '../../utils/js/cryptoAES'
             {required: true, message: '用户名不能为空', trigger: 'blur'}
           ],
           password: [
-            {required: true, message: '密码不能为空', trigger: 'blur'}
-          ]
+            {required: true, message: '密码不可为空', trigger: 'blur'},
+            { pattern: '^[\\w\\W]{6,}$' ,
+              message: '密码需大于等于6位' }
+          ],
         }
       }
       },
